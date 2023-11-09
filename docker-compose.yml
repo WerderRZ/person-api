@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    container_name: db
+    environment:
+      POSTGRES_DB: person
+      POSTGRES_USER: pgadmin
+      POSTGRES_PASSWORD: pgadmin
+    ports:
+      - "15432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: no
+
+volumes:
+  db_data:
