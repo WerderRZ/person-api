@@ -23,15 +23,15 @@ public class LoggingFilter extends OncePerRequestFilter {
 
         HttpServletRequest requestWrapper = new LoggingRequestWrapper(request);
         String requestBody = getBodyFromRequest(requestWrapper);
-        log.debug(String.format("request method: %s, request URI: %s, payload: %s",
-                requestWrapper.getMethod(), requestWrapper.getRequestURI(), requestBody));
+        log.debug("REQUEST DATA: Method: {}, URI: {}, Payload: {}",
+                requestWrapper.getMethod(), requestWrapper.getRequestURI(), requestBody);
 
         // Продолжить обработку запроса
         filterChain.doFilter(requestWrapper, response);
         long duration = System.currentTimeMillis() - startTime;
 
-        log.debug(String.format("response status: %d, request processing time: %d ms",
-                response.getStatus(), duration));
+        log.debug("RESPONSE DATA: Status: {}, Processing time: {} ms",
+                response.getStatus(), duration);
 
     }
 
