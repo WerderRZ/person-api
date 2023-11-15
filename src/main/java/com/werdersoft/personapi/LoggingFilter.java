@@ -1,7 +1,6 @@
 package com.werdersoft.personapi;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -9,12 +8,12 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class LoggingFilter extends OncePerRequestFilter {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoggingFilter.class);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -22,20 +21,31 @@ public class LoggingFilter extends OncePerRequestFilter {
 
         long startTime = System.currentTimeMillis();
 
-        // Продолжить обработку запроса
-        filterChain.doFilter(request, response);
+        LoggingRequestWrapper requestWrapper = new LoggingRequestWrapper(request);
+        StringBuilder requestBody = new StringBuilder();
 
+        try (BufferedReader reader = requestWrapper.getReader()) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                requestBody.append(line);
+            }
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+
+        // Продолжить обработку запроса
+        filterChain.doFilter(requestWrapper, response);
         long duration = System.currentTimeMillis() - startTime;
 
         // Создание записи лога
-        String requestMessage = String.format("request method: %s, request URI: %s",
-                request.getMethod(), request.getRequestURI());
+        String requestMessage = String.format("request method: %s, request URI: %s, payload: %s",
+                requestWrapper.getMethod(), requestWrapper.getRequestURI(), requestBody);
         String responseMessage = String.format("response status: %d, request processing time: %d ms",
                 response.getStatus(), duration);
 
         // Запись лога
-        LOGGER.info(requestMessage);
-        LOGGER.info(responseMessage);
+        log.info(requestMessage);
+        log.info(responseMessage);
 
     }
 }
