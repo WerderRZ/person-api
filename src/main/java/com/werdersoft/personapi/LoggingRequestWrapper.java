@@ -1,5 +1,6 @@
 package com.werdersoft.personapi;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StreamUtils;
 
 import javax.servlet.ReadListener;
@@ -8,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.*;
 
+@Slf4j
 public class LoggingRequestWrapper extends HttpServletRequestWrapper {
 
     private byte[] body;
@@ -18,8 +20,7 @@ public class LoggingRequestWrapper extends HttpServletRequestWrapper {
             InputStream requestInputStream = request.getInputStream();
             body = StreamUtils.copyToByteArray(requestInputStream);
         } catch (IOException e) {
-            // Handle exception
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 
@@ -63,7 +64,7 @@ public class LoggingRequestWrapper extends HttpServletRequestWrapper {
 
         @Override
         public void setReadListener(ReadListener readListener) {
-            // No-op
+
         }
     }
 

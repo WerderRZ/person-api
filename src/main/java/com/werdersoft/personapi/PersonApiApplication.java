@@ -10,7 +10,6 @@ public class PersonApiApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(PersonApiApplication.class, args);
-        log.info("App is running");
     }
 
 }

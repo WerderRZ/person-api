@@ -21,7 +21,21 @@ public class LoggingFilter extends OncePerRequestFilter {
 
         long startTime = System.currentTimeMillis();
 
-        LoggingRequestWrapper requestWrapper = new LoggingRequestWrapper(request);
+        HttpServletRequest requestWrapper = new LoggingRequestWrapper(request);
+        String requestBody = getBodyFromRequest(requestWrapper);
+        log.debug(String.format("request method: %s, request URI: %s, payload: %s",
+                requestWrapper.getMethod(), requestWrapper.getRequestURI(), requestBody));
+
+        // Продолжить обработку запроса
+        filterChain.doFilter(requestWrapper, response);
+        long duration = System.currentTimeMillis() - startTime;
+
+        log.debug(String.format("response status: %d, request processing time: %d ms",
+                response.getStatus(), duration));
+
+    }
+
+    private String getBodyFromRequest(HttpServletRequest requestWrapper) {
         StringBuilder requestBody = new StringBuilder();
 
         try (BufferedReader reader = requestWrapper.getReader()) {
@@ -33,19 +47,6 @@ public class LoggingFilter extends OncePerRequestFilter {
             log.error(e.getMessage());
         }
 
-        // Продолжить обработку запроса
-        filterChain.doFilter(requestWrapper, response);
-        long duration = System.currentTimeMillis() - startTime;
-
-        // Создание записи лога
-        String requestMessage = String.format("request method: %s, request URI: %s, payload: %s",
-                requestWrapper.getMethod(), requestWrapper.getRequestURI(), requestBody);
-        String responseMessage = String.format("response status: %d, request processing time: %d ms",
-                response.getStatus(), duration);
-
-        // Запись лога
-        log.info(requestMessage);
-        log.info(responseMessage);
-
+        return requestBody.toString();
     }
 }
