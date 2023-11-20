@@ -1,4 +1,0 @@
-databaseChangeLog:
-  - include:
-      file: changesets/create-person-table.yaml
-      relativeToChangelogFile: true
