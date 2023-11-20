@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: PA-2
+      author: WerderRZ
+      changes:
+        - createTable:
+            tableName: person
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: person_pk
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: age
+                  type: int
