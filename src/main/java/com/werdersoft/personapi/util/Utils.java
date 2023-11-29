@@ -1,4 +1,4 @@
-package com.werdersoft.personapi;
+package com.werdersoft.personapi.util;
 
 import java.util.List;
 import java.util.Optional;

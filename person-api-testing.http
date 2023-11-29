@@ -1,4 +1,4 @@
-### Create Person
+### Create Person 1
 POST /api/v1/persons
 Host: localhost:8080
 Content-Type: application/json
@@ -6,6 +6,16 @@ Content-Type: application/json
 {
   "name": "Sam",
   "age": 22
+}
+
+### Create Person 2
+POST /api/v1/persons
+Host: localhost:8080
+Content-Type: application/json
+
+{
+"name": "Lake",
+"age": 24
 }
 
 ### Get All Persons
@@ -31,3 +41,59 @@ Content-Type: application/json
 ### Delete Person By ID
 DELETE /api/v1/persons/1
 Host: localhost:8080
+
+
+
+### Create Company
+POST /api/v1/companies
+Host: localhost:8080
+Content-Type: application/json
+
+{
+  "name": "Werdersoft"
+}
+
+### Get All Companies
+GET /api/v1/companies
+Host: localhost:8080
+Accept: application/json
+
+
+
+### Create Subdivision
+POST /api/v1/subdivisions
+Host: localhost:8080
+Content-Type: application/json
+
+{
+  "name": "IT",
+  "companies": [
+    {
+      "id": 1
+    }
+  ]
+}
+
+### Get All Subdivisions
+GET /api/v1/subdivisions
+Host: localhost:8080
+Accept: application/json
+
+
+
+### Create Employee
+POST /api/v1/employees
+Host: localhost:8080
+Content-Type: application/json
+
+{
+  "position": "DEVELOPER",
+  "salary": 996.00,
+  "person_id": 1,
+  "subdivision_id": 1
+}
+
+### Get All Employees
+GET /api/v1/employees
+Host: localhost:8080
+Accept: application/json

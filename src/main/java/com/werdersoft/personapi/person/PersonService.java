@@ -1,10 +1,10 @@
-package com.werdersoft.personapi;
+package com.werdersoft.personapi.person;
 
 import java.util.List;
 
 public interface PersonService {
 
-    List<Person> getAllPersons();
+    List<PersonDTO> getAllPersons();
 
     Person getPersonById(Long id);
 

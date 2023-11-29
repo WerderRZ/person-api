@@ -1,4 +1,4 @@
-package com.werdersoft.personapi;
+package com.werdersoft.personapi.person;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,26 +15,26 @@ public class PersonController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Person> getAllPersons() {
+    public List<PersonDTO> getAllPersons() {
         return personService.getAllPersons();
     }
 
     @GetMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Person getPersonById(@PathVariable Long id) {
-        return personService.getPersonById(id);
+    public PersonDTO getPersonById(@PathVariable Long id) {
+        return personService.getPersonById(id).toPersonDTO();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Person createPerson(@RequestBody Person person) {
-        return personService.createPerson(person);
+    public PersonDTO createPerson(@RequestBody Person person) {
+        return personService.createPerson(person).toPersonDTO();
     }
 
     @PutMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Person updatePersonById(@PathVariable Long id, @RequestBody Person person) {
-        return personService.updatePersonById(id, person);
+    public PersonDTO updatePersonById(@PathVariable Long id, @RequestBody Person person) {
+        return personService.updatePersonById(id, person).toPersonDTO();
     }
 
     @DeleteMapping("{id}")

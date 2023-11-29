@@ -1,8 +1,82 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
 
-    <include file="changesets/create-person-table.xml" relativeToChangelogFile="true" />
+    <changeSet id="PA-2" author="WerderRZ">
+        <createTable tableName="person">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="person_pk" nullable="false" />
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="age" type="int" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="PA-3-1" author="WerderRZ">
+        <createTable tableName="subdivision">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="subdivision_pk" nullable="false" />
+            </column>
+            <column name="name" type="varchar(256)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="PA-3-2" author="WerderRZ">
+        <createTable tableName="company">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="company_pk" nullable="false" />
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="PA-3-3" author="WerderRZ">
+        <createTable tableName="employee">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="employee_pk" nullable="false" />
+            </column>
+            <column name="position" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="salary" type="decimal" />
+            <column name="person_id" type="bigint">
+                <constraints unique="true" foreignKeyName="FK_EMPLOYEE_ON_PERSON"
+                             referencedTableName="person" referencedColumnNames="id" />
+            </column>
+            <column name="subdivision_id" type="bigint">
+                <constraints foreignKeyName="FK_EMPLOYEE_ON_SUBDIVISION"
+                             referencedTableName="subdivision" referencedColumnNames="id" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="PA-3-4" author="WerderRZ">
+        <createTable tableName="subdivisions-companies">
+            <column name="subdivision_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="company_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="PA-3-4-1" author="WerderRZ">
+        <addForeignKeyConstraint baseColumnNames="subdivision_id" baseTableName="subdivisions-companies"
+                                 constraintName="FK_HAS_ON_SUBDIVISION"
+                                 referencedColumnNames="id" referencedTableName="subdivision" />
+    </changeSet>
+    <changeSet id="PA-3-4-2" author="WerderRZ">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="subdivisions-companies"
+                                 constraintName="FK_HAS_ON_COMPANY"
+                                 referencedColumnNames="id" referencedTableName="company" />
+    </changeSet>
 
 </databaseChangeLog>

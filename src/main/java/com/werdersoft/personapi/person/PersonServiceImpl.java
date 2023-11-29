@@ -1,4 +1,4 @@
-package com.werdersoft.personapi;
+package com.werdersoft.personapi.person;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,8 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
-import static com.werdersoft.personapi.Utils.*;
+import static com.werdersoft.personapi.util.Utils.*;
 
 @Service
 @RequiredArgsConstructor
@@ -17,9 +18,11 @@ public class PersonServiceImpl implements PersonService {
     private final PersonRepository personRepository;
 
     @Override
-    public List<Person> getAllPersons() {
+    public List<PersonDTO> getAllPersons() {
         log.debug("Entering getAllPersons method");
-        return toList(personRepository.findAll());
+        List<PersonDTO> personDTOList = new ArrayList<>();
+        personRepository.findAll().forEach(person -> personDTOList.add(person.toPersonDTO()));
+        return personDTOList;
     }
 
     @Override
@@ -50,7 +53,7 @@ public class PersonServiceImpl implements PersonService {
         personRepository.delete(findedPerson);
     }
 
-    private Person findPersonById(Long id) {
+    public Person findPersonById(Long id) {
         log.debug("Entering findPersonById method");
         return toValue(personRepository.findById(id), new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
