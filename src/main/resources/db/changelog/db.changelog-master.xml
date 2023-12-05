@@ -78,5 +78,10 @@
                                  constraintName="FK_HAS_ON_COMPANY"
                                  referencedColumnNames="id" referencedTableName="company" />
     </changeSet>
+    <changeSet id="PA-3-5" author="WerderRZ">
+        <addColumn tableName="company">
+            <column name="region" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>

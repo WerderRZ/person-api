@@ -9,7 +9,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -31,15 +30,5 @@ public class Employee extends BaseEntity {
     @ManyToOne (fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "subdivision_id", nullable = false)
     private Subdivision subdivision;
-
-    public EmployeeDTOResponse toEmployeeResponse() {
-        EmployeeDTOResponse employeeDTO = new EmployeeDTOResponse();
-        employeeDTO.setId(getId());
-        employeeDTO.setPosition(getPosition());
-        employeeDTO.setSalary(getSalary());
-        employeeDTO.setPerson_id(person == null ? null : person.getId());
-        employeeDTO.setSubdivision_id(subdivision == null ? null : subdivision.getId());
-        return employeeDTO;
-    }
 
 }

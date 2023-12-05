@@ -5,11 +5,8 @@ import java.util.List;
 public interface SubdivisionService {
     List<SubdivisionDTO> getAllSubdivisions();
 
-    Subdivision getSubdivisionById(Long id);
+    SubdivisionDTO getSubdivisionById(Long id);
 
-    Subdivision createSubdivision(Subdivision subdivision);
+    SubdivisionDTO createSubdivision(SubdivisionDTO subdivisionDTO);
 
-    Subdivision updateSubdivisionById(Long id, Subdivision subdivision);
-
-    void deleteSubdivisionById(Long id);
 }

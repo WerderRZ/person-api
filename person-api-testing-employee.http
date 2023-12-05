@@ -1,0 +1,16 @@
+### Create Employee
+POST /api/v1/employees
+Host: localhost:8080
+Content-Type: application/json
+
+{
+  "position": "DEVELOPER",
+  "salary": 300.00,
+  "personId": 1,
+  "subdivisionId": 1
+}
+
+### Get All Employees
+GET /api/v1/employees
+Host: localhost:8080
+Accept: application/json

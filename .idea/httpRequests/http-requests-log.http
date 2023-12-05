@@ -1,0 +1,730 @@
+GET http://localhost:8080/api/v1/employees
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T132912.200.json
+
+###
+
+POST http://localhost:8080/api/v1/employees
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 88
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "position": "DEVELOPER",
+  "salary": 300.00,
+  "personId": 1,
+  "subdivisionId": 1
+}
+
+<> 2023-12-05T132910.201.json
+
+###
+
+GET http://localhost:8080/api/v1/companies
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T132854.200.json
+
+###
+
+POST http://localhost:8080/api/v1/companies
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 46
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Werdersoft",
+  "region": "ASIA"
+}
+
+<> 2023-12-05T132848.201.json
+
+###
+
+GET http://localhost:8080/api/v1/subdivisions
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T132832.200.json
+
+###
+
+POST http://localhost:8080/api/v1/subdivisions
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 50
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "IT",
+  "companiesIds": [
+     1
+  ]
+}
+
+<> 2023-12-05T132807.201.json
+
+###
+
+GET http://localhost:8080/api/v1/companies
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T132652.200.json
+
+###
+
+POST http://localhost:8080/api/v1/companies
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 46
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Werdersoft",
+  "region": "ASIA"
+}
+
+<> 2023-12-05T132649.201.json
+
+###
+
+GET http://localhost:8080/api/v1/persons/1
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T132640.200.json
+
+###
+
+GET http://localhost:8080/api/v1/persons
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T132638.200.json
+
+###
+
+POST http://localhost:8080/api/v1/persons
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 33
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Lake",
+  "age": 24
+}
+
+<> 2023-12-05T132636.201.json
+
+###
+
+POST http://localhost:8080/api/v1/persons
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 32
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Sam",
+  "age": 22
+}
+
+<> 2023-12-05T132635.201.json
+
+###
+
+GET http://localhost:8080/api/v1/employees
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T132415.200.json
+
+###
+
+POST http://localhost:8080/api/v1/employees
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 88
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "position": "DEVELOPER",
+  "salary": 300.00,
+  "personId": 1,
+  "subdivisionId": 1
+}
+
+<> 2023-12-05T132412.201.json
+
+###
+
+GET http://localhost:8080/api/v1/companies
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T132246.200.json
+
+###
+
+GET http://localhost:8080/api/v1/subdivisions
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T132234.200.json
+
+###
+
+POST http://localhost:8080/api/v1/subdivisions
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 47
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "IT",
+  "companies": [
+     1
+  ]
+}
+
+<> 2023-12-05T132225.201.json
+
+###
+
+GET http://localhost:8080/api/v1/companies
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T132137.200.json
+
+###
+
+POST http://localhost:8080/api/v1/companies
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 46
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Werdersoft",
+  "region": "ASIA"
+}
+
+<> 2023-12-05T132133.201.json
+
+###
+
+GET http://localhost:8080/api/v1/persons/1
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T132123.200.json
+
+###
+
+GET http://localhost:8080/api/v1/persons
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T132119.200.json
+
+###
+
+POST http://localhost:8080/api/v1/persons
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 33
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Lake",
+  "age": 24
+}
+
+<> 2023-12-05T132117.201.json
+
+###
+
+POST http://localhost:8080/api/v1/persons
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 32
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Sam",
+  "age": 22
+}
+
+<> 2023-12-05T132115.201.json
+
+###
+
+GET http://localhost:8080/api/v1/companies
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T095717.200.json
+
+###
+
+GET http://localhost:8080/api/v1/subdivisions
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T095709.200.json
+
+###
+
+POST http://localhost:8080/api/v1/subdivisions
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 66
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "IT",
+  "companies": [
+    {
+      "id": 1
+    }
+  ]
+}
+
+<> 2023-12-05T095707.201.json
+
+###
+
+GET http://localhost:8080/api/v1/companies
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T095651.200.json
+
+###
+
+POST http://localhost:8080/api/v1/companies
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 46
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Werdersoft",
+  "region": "ASIA"
+}
+
+<> 2023-12-05T095648.201.json
+
+###
+
+GET http://localhost:8080/api/v1/companies
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T094202.200.json
+
+###
+
+GET http://localhost:8080/api/v1/employees
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T091003.200.json
+
+###
+
+POST http://localhost:8080/api/v1/employees
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 88
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "position": "DEVELOPER",
+  "salary": 300.00,
+  "personId": 1,
+  "subdivisionId": 1
+}
+
+<> 2023-12-05T091000.201.json
+
+###
+
+GET http://localhost:8080/api/v1/employees
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T090942.200.json
+
+###
+
+GET http://localhost:8080/api/v1/employees
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T071910.200.json
+
+###
+
+POST http://localhost:8080/api/v1/employees
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 88
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "position": "DEVELOPER",
+  "salary": 996.00,
+  "personId": 2,
+  "subdivisionId": 1
+}
+
+<> 2023-12-05T071902.201.json
+
+###
+
+GET http://localhost:8080/api/v1/companies
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T071849.200.json
+
+###
+
+GET http://localhost:8080/api/v1/subdivisions
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T071841.200.json
+
+###
+
+POST http://localhost:8080/api/v1/subdivisions
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 66
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "IT",
+  "companies": [
+    {
+      "id": 1
+    }
+  ]
+}
+
+<> 2023-12-05T071836.201.json
+
+###
+
+GET http://localhost:8080/api/v1/companies
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T071814.200.json
+
+###
+
+POST http://localhost:8080/api/v1/companies
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 46
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Werdersoft",
+  "region": "ASIA"
+}
+
+<> 2023-12-05T071812.201.json
+
+###
+
+GET http://localhost:8080/api/v1/persons
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T071756.200.json
+
+###
+
+PUT http://localhost:8080/api/v1/persons/1
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 32
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Tom",
+  "age": 28
+}
+
+<> 2023-12-05T071753.200.json
+
+###
+
+GET http://localhost:8080/api/v1/persons/1
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T071747.200.json
+
+###
+
+GET http://localhost:8080/api/v1/persons
+Host: localhost:8080
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-12-05T071744.200.json
+
+###
+
+POST http://localhost:8080/api/v1/persons
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 33
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Lake",
+  "age": 24
+}
+
+<> 2023-12-05T071740.201.json
+
+###
+
+POST http://localhost:8080/api/v1/persons
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 32
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Sam",
+  "age": 22
+}
+
+<> 2023-12-05T071738.201.json
+
+###
+
+POST http://localhost:8080/api/v1/employees
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 88
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "position": "DEVELOPER",
+  "salary": 996.00,
+  "personId": 2,
+  "subdivisionId": 1
+}
+
+<> 2023-12-05T071547.500.json
+
+###
+
+POST http://localhost:8080/api/v1/employees
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 88
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "position": "DEVELOPER",
+  "salary": 996.00,
+  "personId": 2,
+  "subdivisionId": 1
+}
+
+<> 2023-12-05T071504.500.json
+
+###
+
+POST http://localhost:8080/api/v1/employees
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 88
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "position": "DEVELOPER",
+  "salary": 996.00,
+  "personId": 2,
+  "subdivisionId": 1
+}
+
+<> 2023-12-05T071425.500.json
+
+###
+
+POST http://localhost:8080/api/v1/employees
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 90
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "position": "DEVELOPER",
+  "salary": 996.00,
+  "person_id": 2,
+  "subdivision_id": 1
+}
+
+<> 2023-12-05T070755.500.json
+
+###
+
+POST http://localhost:8080/api/v1/employees
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 90
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "position": "DEVELOPER",
+  "salary": 996.00,
+  "person_id": 2,
+  "subdivision_id": 1
+}
+
+<> 2023-12-05T070420.500.json
+
+###
+

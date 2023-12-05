@@ -22,19 +22,19 @@ public class PersonController {
     @GetMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
     public PersonDTO getPersonById(@PathVariable Long id) {
-        return personService.getPersonById(id).toPersonDTO();
+        return personService.getPersonById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PersonDTO createPerson(@RequestBody Person person) {
-        return personService.createPerson(person).toPersonDTO();
+    public PersonDTO createPerson(@RequestBody PersonDTO personDTO) {
+        return personService.createPerson(personDTO);
     }
 
     @PutMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
-    public PersonDTO updatePersonById(@PathVariable Long id, @RequestBody Person person) {
-        return personService.updatePersonById(id, person).toPersonDTO();
+    public PersonDTO updatePersonById(@PathVariable Long id, @RequestBody PersonDTO personDTO) {
+        return personService.updatePersonById(id, personDTO);
     }
 
     @DeleteMapping("{id}")

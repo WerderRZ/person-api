@@ -16,34 +16,35 @@ import static com.werdersoft.personapi.util.Utils.*;
 public class PersonServiceImpl implements PersonService {
 
     private final PersonRepository personRepository;
+    private final PersonMapper personMapper;
 
     @Override
     public List<PersonDTO> getAllPersons() {
         log.debug("Entering getAllPersons method");
         List<PersonDTO> personDTOList = new ArrayList<>();
-        personRepository.findAll().forEach(person -> personDTOList.add(person.toPersonDTO()));
+        personRepository.findAll().forEach(person -> personDTOList.add(personMapper.toPersonDTO(person)));
         return personDTOList;
     }
 
     @Override
-    public Person getPersonById(Long id) {
+    public PersonDTO getPersonById(Long id) {
         log.debug("Entering getPersonById method");
-        return findPersonById(id);
+        return personMapper.toPersonDTO(findPersonById(id));
     }
 
     @Override
-    public Person createPerson(Person person) {
+    public PersonDTO createPerson(PersonDTO personDTO) {
         log.debug("Entering createPerson method");
-        return personRepository.save(person);
+        return personMapper.toPersonDTO(personRepository.save(personMapper.toPerson(personDTO)));
     }
 
     @Override
-    public Person updatePersonById(Long id, Person person) {
+    public PersonDTO updatePersonById(Long id, PersonDTO personDTO) {
         log.debug("Entering updatePersonById method");
         Person findedPerson = findPersonById(id);
-        findedPerson.setName(person.getName());
-        findedPerson.setAge(person.getAge());
-        return personRepository.save(findedPerson);
+        findedPerson.setName(personDTO.getName());
+        findedPerson.setAge(personDTO.getAge());
+        return personMapper.toPersonDTO(personRepository.save(findedPerson));
     }
 
     @Override

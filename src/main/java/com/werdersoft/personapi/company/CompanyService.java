@@ -6,6 +6,6 @@ public interface CompanyService {
 
     List<CompanyDTO> getAllCompanies();
 
-    Company createCompany(Company company);
+    CompanyDTO createCompany(Company company);
 
 }

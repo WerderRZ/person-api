@@ -3,13 +3,10 @@ package com.werdersoft.personapi.employee;
 import java.util.List;
 
 public interface EmployeeService {
-    List<EmployeeDTOResponse> getAllEmployees();
+    List<EmployeeDTO> getAllEmployees();
 
-    Employee getEmployeeById(Long id);
+    EmployeeDTO getEmployeeById(Long id);
 
-    Employee createEmployee(EmployeeDTORequest employee);
+    EmployeeDTO createEmployee(EmployeeDTO employeeDTO);
 
-    Employee updateEmployeeById(Long id, Employee employee);
-
-    void deleteEmployeeById(Long id);
 }

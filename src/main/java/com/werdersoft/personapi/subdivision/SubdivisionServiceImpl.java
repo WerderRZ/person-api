@@ -8,46 +8,34 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.werdersoft.personapi.util.Utils.toList;
 import static com.werdersoft.personapi.util.Utils.toValue;
 
 @Service
 @RequiredArgsConstructor
 public class SubdivisionServiceImpl implements SubdivisionService {
 
-    private final SubversionRepository subversionRepository;
+    private final SubdivisionRepository subdivisionRepository;
+    private final SubdivisionMapper subdivisionMapper;
 
     @Override
     public List<SubdivisionDTO> getAllSubdivisions() {
         List<SubdivisionDTO> subdivisionDTOList = new ArrayList<>();
-        subversionRepository.findAll().forEach(subdivision -> subdivisionDTOList.add(subdivision.toSubdivisionDTO()));
+        subdivisionRepository.findAll().forEach(subdivision -> subdivisionDTOList.add(subdivisionMapper.toSubdivisionDTO(subdivision)));
         return subdivisionDTOList;
     }
 
     @Override
-    public Subdivision getSubdivisionById(Long id) {
-        return findSubversionById(id);
+    public SubdivisionDTO getSubdivisionById(Long id) {
+        return subdivisionMapper.toSubdivisionDTO(findSubversionById(id));
     }
 
     @Override
-    public Subdivision createSubdivision(Subdivision subdivision) {
-        return subversionRepository.save(subdivision);
-    }
-
-    @Override
-    public Subdivision updateSubdivisionById(Long id, Subdivision subdivision) {
-        Subdivision foundSubversion = findSubversionById(id);
-        foundSubversion.setName(subdivision.getName());
-        return subversionRepository.save(foundSubversion);
-    }
-
-    @Override
-    public void deleteSubdivisionById(Long id) {
-        Subdivision foundSubversion = findSubversionById(id);
-        subversionRepository.delete(foundSubversion);
+    public SubdivisionDTO createSubdivision(SubdivisionDTO subdivisionDTO) {
+        return subdivisionMapper.toSubdivisionDTO(subdivisionRepository
+                .save(subdivisionMapper.toSubdivision(subdivisionDTO)));
     }
 
     public Subdivision findSubversionById(Long id) {
-        return toValue(subversionRepository.findById(id), new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return toValue(subdivisionRepository.findById(id), new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 }

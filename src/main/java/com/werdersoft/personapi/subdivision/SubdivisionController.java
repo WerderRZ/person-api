@@ -19,15 +19,16 @@ public class SubdivisionController {
         return subdivisionService.getAllSubdivisions();
     }
 
-//    Subdivision getSubdivisionById(Long id);
+    @GetMapping("{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public SubdivisionDTO getSubdivisionById(@PathVariable Long id) {
+        return subdivisionService.getSubdivisionById(id);
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public SubdivisionDTO createSubdivision(@RequestBody Subdivision subdivision) {
-        return subdivisionService.createSubdivision(subdivision).toSubdivisionDTO();
+    public SubdivisionDTO createSubdivision(@RequestBody SubdivisionDTO subdivisionDTO) {
+        return subdivisionService.createSubdivision(subdivisionDTO);
     }
-//
-//    Subdivision updateSubdivisionById(Long id, Subdivision subdivision);
-//
-//    void deleteSubdivisionById(Long id);
+
 }

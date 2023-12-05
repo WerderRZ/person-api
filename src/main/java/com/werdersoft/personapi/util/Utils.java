@@ -1,7 +1,10 @@
 package com.werdersoft.personapi.util;
 
-import java.util.List;
-import java.util.Optional;
+import com.werdersoft.personapi.dto.BaseDTO;
+import com.werdersoft.personapi.entity.BaseEntity;
+import com.werdersoft.personapi.subdivision.Subdivision;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -18,4 +21,19 @@ public class Utils {
     public static <T> T toValue(Optional<T> op, RuntimeException ex) {
         return op.orElseThrow(() -> ex);
     }
+
+    public static List<Long> mapEntitiesToEntitiesIds(Set<? extends BaseEntity> entity)  {
+        if (entity != null) {
+            return entity.stream()
+                    .map(BaseEntity::getId)
+                    .toList();
+        } else {
+            return new ArrayList<Long>();
+        }
+    }
+
+    public static <T extends BaseEntity> Long mapEntityToEntityId(T entity) {
+        return (entity != null) ? entity.getId() : null;
+    }
+
 }

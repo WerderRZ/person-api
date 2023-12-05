@@ -1,0 +1,14 @@
+### Create Company
+POST /api/v1/companies
+Host: localhost:8080
+Content-Type: application/json
+
+{
+  "name": "Werdersoft",
+  "region": "ASIA"
+}
+
+### Get All Companies
+GET /api/v1/companies
+Host: localhost:8080
+Accept: application/json

@@ -1,0 +1,18 @@
+
+### Create Subdivision
+### Возвращать также responce, как и request (поле companies - массив companies_ids)
+POST /api/v1/subdivisions
+Host: localhost:8080
+Content-Type: application/json
+
+{
+  "name": "IT",
+  "companiesIds": [
+     1
+  ]
+}
+
+### Get All Subdivisions
+GET /api/v1/subdivisions
+Host: localhost:8080
+Accept: application/json

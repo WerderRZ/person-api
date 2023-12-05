@@ -6,11 +6,11 @@ public interface PersonService {
 
     List<PersonDTO> getAllPersons();
 
-    Person getPersonById(Long id);
+    PersonDTO getPersonById(Long id);
 
-    Person createPerson(Person person);
+    PersonDTO createPerson(PersonDTO personDTO);
 
-    Person updatePersonById(Long id, Person person);
+    PersonDTO updatePersonById(Long id, PersonDTO personDTO);
 
     void deletePersonById(Long id);
 

@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -38,11 +37,11 @@ public class Subdivision extends BaseEntity {
 
         List<Long> employeeIds = new ArrayList<>();
         employees.forEach(employee -> employeeIds.add(employee.getId()));
-        subdivisionDTO.setEmployee_ids(employeeIds);
+        subdivisionDTO.setEmployeesIds(employeeIds);
 
         List<Long> companyIds = new ArrayList<>();
         companies.forEach(company -> companyIds.add(company.getId()));
-        subdivisionDTO.setCompany_ids(companyIds);
+        subdivisionDTO.setCompaniesIds(companyIds);
 
         return subdivisionDTO;
     }
