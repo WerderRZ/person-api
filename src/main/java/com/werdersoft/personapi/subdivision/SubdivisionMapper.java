@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public abstract class SubdivisionMapper {
@@ -32,15 +33,15 @@ public abstract class SubdivisionMapper {
     })
     public abstract Subdivision toSubdivision(SubdivisionDTO subdivisionDTO);
 
-    public List<Long> mapEmployeesToEmployeesIds(Set<Employee> employees) {
+    public List<UUID> mapEmployeesToEmployeesIds(Set<Employee> employees) {
         return Utils.mapEntitiesToEntitiesIds(employees);
     }
 
-    public List<Long> mapCompaniesToCompaniesIds(Set<Company> companies) {
+    public List<UUID> mapCompaniesToCompaniesIds(Set<Company> companies) {
         return Utils.mapEntitiesToEntitiesIds(companies);
     }
 
-//    public Set<Employee> mapEmployeesIdsToEmployees(List<Long> employeesIds) {
+//    public Set<Employee> mapEmployeesIdsToEmployees(List<UUID> employeesIds) {
 //        Set<Employee> employeeSet = new HashSet<>();
 //        if (employeesIds != null) {
 //            employeesIds.forEach(id -> employeeSet.add(employeeService.findEmployeeById(id)));
@@ -48,7 +49,7 @@ public abstract class SubdivisionMapper {
 //        return employeeSet;
 //    }
 
-    public Set<Company> mapCompaniesIdsToCompanies(List<Long> companiesIds) {
+    public Set<Company> mapCompaniesIdsToCompanies(List<UUID> companiesIds) {
         Set<Company> companySet = new HashSet<>();
         if (companiesIds != null) {
             companiesIds.forEach(id -> companySet.add(companyService.findCompanyById(id)));

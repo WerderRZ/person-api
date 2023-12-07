@@ -8,6 +8,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 import static com.werdersoft.personapi.util.Utils.*;
 
 @Service
@@ -27,7 +29,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public PersonDTO getPersonById(Long id) {
+    public PersonDTO getPersonById(UUID id) {
         log.debug("Entering getPersonById method");
         return personMapper.toPersonDTO(findPersonById(id));
     }
@@ -39,7 +41,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public PersonDTO updatePersonById(Long id, PersonDTO personDTO) {
+    public PersonDTO updatePersonById(UUID id, PersonDTO personDTO) {
         log.debug("Entering updatePersonById method");
         Person findedPerson = findPersonById(id);
         findedPerson.setName(personDTO.getName());
@@ -48,13 +50,13 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public void deletePersonById(Long id) {
+    public void deletePersonById(UUID id) {
         log.debug("Entering deletePersonById method");
         Person findedPerson = findPersonById(id);
         personRepository.delete(findedPerson);
     }
 
-    public Person findPersonById(Long id) {
+    public Person findPersonById(UUID id) {
         log.debug("Entering findPersonById method");
         return toValue(personRepository.findById(id), new ResponseStatusException(HttpStatus.NOT_FOUND));
     }

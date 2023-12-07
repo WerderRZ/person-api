@@ -5,7 +5,7 @@ Content-Type: application/json
 {
   "name": "IT",
   "companiesIds": [
-    {{company_id}}
+    "{{company_id}}"
   ]
 }
 

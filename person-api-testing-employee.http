@@ -5,8 +5,8 @@ Content-Type: application/json
 {
   "position": "DEVELOPER",
   "salary": 300.00,
-  "personId": {{person_id}},
-  "subdivisionId": {{subdivision_id}}
+  "personId": "{{person_id}}",
+  "subdivisionId": "{{subdivision_id}}"
 }
 
 > {%

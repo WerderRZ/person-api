@@ -1,17 +1,18 @@
 package com.werdersoft.personapi.person;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface PersonService {
 
     List<PersonDTO> getAllPersons();
 
-    PersonDTO getPersonById(Long id);
+    PersonDTO getPersonById(UUID id);
 
     PersonDTO createPerson(PersonDTO personDTO);
 
-    PersonDTO updatePersonById(Long id, PersonDTO personDTO);
+    PersonDTO updatePersonById(UUID id, PersonDTO personDTO);
 
-    void deletePersonById(Long id);
+    void deletePersonById(UUID id);
 
 }

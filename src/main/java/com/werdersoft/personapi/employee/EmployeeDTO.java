@@ -8,6 +8,7 @@ import lombok.Setter;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -19,8 +20,8 @@ public class EmployeeDTO extends BaseDTO {
     private BigDecimal salary;
 
     @NotNull(message = "Field 'personId' cannot be empty")
-    private Long personId;
+    private UUID personId;
 
     @NotNull(message = "Field 'subdivisionId' cannot be empty")
-    private Long subdivisionId;
+    private UUID subdivisionId;
 }

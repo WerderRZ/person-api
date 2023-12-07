@@ -22,17 +22,17 @@ public class Utils {
         return op.orElseThrow(() -> ex);
     }
 
-    public static List<Long> mapEntitiesToEntitiesIds(Set<? extends BaseEntity> entity)  {
+    public static List<UUID> mapEntitiesToEntitiesIds(Set<? extends BaseEntity> entity)  {
         if (entity != null) {
             return entity.stream()
                     .map(BaseEntity::getId)
                     .toList();
         } else {
-            return new ArrayList<Long>();
+            return new ArrayList<UUID>();
         }
     }
 
-    public static <T extends BaseEntity> Long mapEntityToEntityId(T entity) {
+    public static <T extends BaseEntity> UUID mapEntityToEntityId(T entity) {
         return (entity != null) ? entity.getId() : null;
     }
 

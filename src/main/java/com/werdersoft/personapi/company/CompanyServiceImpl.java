@@ -7,6 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static com.werdersoft.personapi.util.Utils.toValue;
 
@@ -29,7 +30,7 @@ public class CompanyServiceImpl implements CompanyService{
         return companyMapper.toCompanyDTO(companyRepository.save(company));
     }
 
-    public Company findCompanyById(Long id) {
+    public Company findCompanyById(UUID id) {
         return toValue(companyRepository.findById(id), new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 }

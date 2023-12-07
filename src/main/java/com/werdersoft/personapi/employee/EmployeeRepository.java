@@ -2,5 +2,7 @@ package com.werdersoft.personapi.employee;
 
 import org.springframework.data.repository.CrudRepository;
 
-public interface EmployeeRepository extends CrudRepository<Employee, Long> {
+import java.util.UUID;
+
+public interface EmployeeRepository extends CrudRepository<Employee, UUID> {
 }

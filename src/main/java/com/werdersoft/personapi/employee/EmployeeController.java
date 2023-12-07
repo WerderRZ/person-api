@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/employees")
@@ -24,7 +25,7 @@ public class EmployeeController {
 
     @GetMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
-    public EmployeeDTO getEmployeeById(@PathVariable Long id) {
+    public EmployeeDTO getEmployeeById(@PathVariable UUID id) {
         return employeeService.getEmployeeById(id);
     }
 

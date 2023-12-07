@@ -10,6 +10,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -35,11 +36,11 @@ public class Subdivision extends BaseEntity {
         subdivisionDTO.setId(getId());
         subdivisionDTO.setName(getName());
 
-        List<Long> employeeIds = new ArrayList<>();
+        List<UUID> employeeIds = new ArrayList<>();
         employees.forEach(employee -> employeeIds.add(employee.getId()));
         subdivisionDTO.setEmployeesIds(employeeIds);
 
-        List<Long> companyIds = new ArrayList<>();
+        List<UUID> companyIds = new ArrayList<>();
         companies.forEach(company -> companyIds.add(company.getId()));
         subdivisionDTO.setCompaniesIds(companyIds);
 

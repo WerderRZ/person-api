@@ -7,6 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static com.werdersoft.personapi.util.Utils.toValue;
 
@@ -25,7 +26,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeDTO getEmployeeById(Long id) {
+    public EmployeeDTO getEmployeeById(UUID id) {
         return employeeMapper.toEmployeeDTO(findEmployeeById(id));
     }
 
@@ -34,7 +35,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeMapper.toEmployeeDTO(employeeRepository.save(employeeMapper.toEmployee(employeeDTO)));
     }
 
-    public Employee findEmployeeById(Long id) {
+    public Employee findEmployeeById(UUID id) {
         return toValue(employeeRepository.findById(id), new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 

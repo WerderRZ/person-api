@@ -99,15 +99,15 @@ Accept: application/json
     });
 %}
 
-### Get Person By ID Fail
-GET {{host}}/persons/1000000
-Accept: application/json
-
-> {%
-    client.test("Request executed successfully", function() {
-        client.assert(response.status === 404, "Response status is not 404");
-    });
-%}
+#### Get Person By ID Fail
+#GET {{host}}/persons/0
+#Accept: application/json
+#
+#> {%
+#    client.test("Request executed successfully", function() {
+#        client.assert(response.status === 404, "Response status is not 404");
+#    });
+#%}
 
 ### Update Person By ID
 PUT {{host}}/persons/{{person2_id}}

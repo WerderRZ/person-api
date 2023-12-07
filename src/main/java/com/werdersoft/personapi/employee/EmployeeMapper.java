@@ -8,6 +8,8 @@ import com.werdersoft.personapi.util.Utils;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.UUID;
+
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public abstract class EmployeeMapper {
 
@@ -29,19 +31,19 @@ public abstract class EmployeeMapper {
     })
     public abstract EmployeeDTO toEmployeeDTO(Employee employee);
 
-    public Person mapPersonIdToPerson(Long id) {
+    public Person mapPersonIdToPerson(UUID id) {
          return personService.findPersonById(id);
     }
 
-    public Subdivision mapSubdivisionIdToSubdivision(Long id) {
+    public Subdivision mapSubdivisionIdToSubdivision(UUID id) {
         return subdivisionService.findSubversionById(id);
     }
 
-    public Long mapPersonToPersonId(Person person) {
+    public UUID mapPersonToPersonId(Person person) {
         return Utils.mapEntityToEntityId(person);
     }
 
-    public Long mapSubdivisionToSubdivisionId(Subdivision subdivision) {
+    public UUID mapSubdivisionToSubdivisionId(Subdivision subdivision) {
         return Utils.mapEntityToEntityId(subdivision);
     }
 

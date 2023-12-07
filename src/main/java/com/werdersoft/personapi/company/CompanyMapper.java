@@ -11,10 +11,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public abstract class CompanyMapper {
@@ -28,11 +25,11 @@ public abstract class CompanyMapper {
 //    @Mapping(source = "subdivisionsIds", target = "subdivisions")
 //    public abstract Company toCompany(CompanyDTO companyDTO);
 
-    public List<Long> mapSubdivisionsToSubdivisionsIds(Set<Subdivision> subdivisions) {
+    public List<UUID> mapSubdivisionsToSubdivisionsIds(Set<Subdivision> subdivisions) {
         return Utils.mapEntitiesToEntitiesIds(subdivisions);
     }
 
-//    public Set<Subdivision> mapSubdivisionsIdsToSubdivisions(List<Long> subdivisionsIds) {
+//    public Set<Subdivision> mapSubdivisionsIdsToSubdivisions(List<UUID> subdivisionsIds) {
 //        Set<Subdivision>  subdivisionSet = new HashSet<>();
 //        if (subdivisionsIds != null) {
 //            subdivisionsIds.forEach(id -> subdivisionSet.add(subdivisionService.findSubversionById(id)));

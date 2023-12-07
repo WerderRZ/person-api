@@ -7,6 +7,7 @@ import lombok.Setter;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -16,7 +17,7 @@ public class SubdivisionDTO extends BaseDTO {
     @Size(min = 1, message = "Name should have at least 1 character")
     private String name;
 
-    private List<Long> employeesIds;
+    private List<UUID> employeesIds;
 
-    private List<Long> companiesIds;
+    private List<UUID> companiesIds;
 }

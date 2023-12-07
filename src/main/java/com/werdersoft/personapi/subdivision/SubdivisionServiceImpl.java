@@ -7,6 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static com.werdersoft.personapi.util.Utils.toValue;
 
@@ -25,7 +26,7 @@ public class SubdivisionServiceImpl implements SubdivisionService {
     }
 
     @Override
-    public SubdivisionDTO getSubdivisionById(Long id) {
+    public SubdivisionDTO getSubdivisionById(UUID id) {
         return subdivisionMapper.toSubdivisionDTO(findSubversionById(id));
     }
 
@@ -35,7 +36,7 @@ public class SubdivisionServiceImpl implements SubdivisionService {
                 .save(subdivisionMapper.toSubdivision(subdivisionDTO)));
     }
 
-    public Subdivision findSubversionById(Long id) {
+    public Subdivision findSubversionById(UUID id) {
         return toValue(subdivisionRepository.findById(id), new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 }

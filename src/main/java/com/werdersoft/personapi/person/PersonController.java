@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 
 @Validated
 @RestController
@@ -25,7 +26,7 @@ public class PersonController {
 
     @GetMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
-    public PersonDTO getPersonById(@PathVariable Long id) {
+    public PersonDTO getPersonById(@PathVariable UUID id) {
         return personService.getPersonById(id);
     }
 
@@ -37,13 +38,13 @@ public class PersonController {
 
     @PutMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
-    public PersonDTO updatePersonById(@PathVariable Long id, @Valid @RequestBody PersonDTO personDTO) {
+    public PersonDTO updatePersonById(@PathVariable UUID id, @Valid @RequestBody PersonDTO personDTO) {
         return personService.updatePersonById(id, personDTO);
     }
 
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePersonById(@PathVariable Long id) {
+    public void deletePersonById(@PathVariable UUID id) {
         personService.deletePersonById(id);
     }
 

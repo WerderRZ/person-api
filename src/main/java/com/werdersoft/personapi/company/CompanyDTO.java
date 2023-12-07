@@ -6,11 +6,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
 public class CompanyDTO extends BaseDTO {
     private String name;
     private Region region;
-    private List<Long> subdivisionsIds;
+    private List<UUID> subdivisionsIds;
 }
