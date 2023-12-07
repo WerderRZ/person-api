@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.util.Set;
 
 @Entity
@@ -15,6 +17,8 @@ import java.util.Set;
 @Table(name = "company")
 public class Company extends BaseEntity {
 
+    @NotEmpty(message = "Name should not be empty")
+    @Size(min = 1, message = "Name should have at least 1 character")
     @Column(name = "name")
     private String name;
 

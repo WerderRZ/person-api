@@ -1,7 +1,5 @@
 ### Create Person 1
-### Добавить валидацию полей с помощью hibernate validator (пример: без поля name)
-POST /api/v1/persons
-Host: localhost:8080
+POST {{host}}/persons
 Content-Type: application/json
 
 {
@@ -9,9 +7,23 @@ Content-Type: application/json
   "age": 22
 }
 
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+    client.test("Headers option exists", function() {
+        client.assert(response.headers.valueOf("Content-Type") === "application/json", "Content type isn't JSON");
+    });
+    client.test("Response body is correct", function () {
+        client.assert(response.body.hasOwnProperty("id"), "Cannot find 'id' field");
+        client.assert(response.body.name === "Sam", "not correct name");
+        client.assert(response.body.age === 22, "not correct age");
+    });
+    client.global.set("person_id", response.body.id);
+ %}
+
 ### Create Person 2
-POST /api/v1/persons
-Host: localhost:8080
+POST {{host}}/persons
 Content-Type: application/json
 
 {
@@ -19,20 +31,86 @@ Content-Type: application/json
   "age": 24
 }
 
-### Get All Persons +
-GET /api/v1/persons
-Host: localhost:8080
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+    client.test("Headers option exists", function() {
+        client.assert(response.headers.valueOf("Content-Type") === "application/json", "Content type isn't JSON");
+    });
+    client.test("Response body is correct", function () {
+        client.assert(response.body.hasOwnProperty("id"), "Cannot find 'id' field");
+        client.assert(response.body.name === "Lake", "not correct name");
+        client.assert(response.body.age === 24, "not correct age");
+    });
+    client.global.set("person2_id", response.body.id);
+%}
+
+### Create Person Fail
+POST {{host}}/persons
+Content-Type: application/json
+
+{
+  "age": -30
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 400, "Response status is not 400");
+    });
+%}
+
+### Get All Persons
+GET {{host}}/persons
 Accept: application/json
 
-### Get Person By ID +
-GET /api/v1/persons/1
-Host: localhost:8080
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.test("Headers option exists", function() {
+        client.assert(response.headers.valueOf("Content-Type") === "application/json", "Content type isn't JSON");
+    });
+    client.test("Response body is correct", function () {
+        var personId = client.global.get("person_id");
+        var foundItem = response.body.find(function(item) {
+            if (item.id == personId) {
+                return item.name === "Sam" && item.age === 22;
+            }
+        });
+        client.assert(foundItem, "Cannot find '" + personId + "' field")
+    });
+%}
+
+### Get Person By ID
+GET {{host}}/persons/{{person_id}}
 Accept: application/json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.test("Headers option exists", function() {
+        client.assert(response.headers.valueOf("Content-Type") === "application/json", "Content type isn't JSON");
+    });
+    client.test("Response body is correct", function () {
+        client.assert(response.body.name === "Sam", "not correct name");
+        client.assert(response.body.age === 22, "not correct age");
+    });
+%}
+
+### Get Person By ID Fail
+GET {{host}}/persons/1000000
+Accept: application/json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 404, "Response status is not 404");
+    });
+%}
 
 ### Update Person By ID
-### Валидация запросов (поле age)
-PUT /api/v1/persons/1
-Host: localhost:8080
+PUT {{host}}/persons/{{person2_id}}
 Content-Type: application/json
 
 {
@@ -40,6 +118,25 @@ Content-Type: application/json
   "age": 28
 }
 
-### Delete Person By ID +
-DELETE /api/v1/persons/1
-Host: localhost:8080
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.test("Headers option exists", function() {
+        client.assert(response.headers.valueOf("Content-Type") === "application/json", "Content type isn't JSON");
+    });
+    client.test("Response body is correct", function () {
+        client.assert(response.body.hasOwnProperty("id"), "Cannot find 'id' field");
+        client.assert(response.body.name === "Tom", "not correct name");
+        client.assert(response.body.age === 28, "not correct age");
+    });
+%}
+
+### Delete Person By ID
+DELETE {{host}}/persons/{{person2_id}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 204, "Response status is not 204");
+    });
+%}

@@ -1,16 +1,82 @@
 ### Create Employee
-POST /api/v1/employees
-Host: localhost:8080
+POST {{host}}/employees
 Content-Type: application/json
 
 {
   "position": "DEVELOPER",
   "salary": 300.00,
-  "personId": 1,
-  "subdivisionId": 1
+  "personId": {{person_id}},
+  "subdivisionId": {{subdivision_id}}
 }
 
-### Get All Employees
-GET /api/v1/employees
-Host: localhost:8080
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+    client.test("Headers option exists", function() {
+        client.assert(response.headers.valueOf("Content-Type") === "application/json", "Content type isn't JSON");
+    });
+    client.test("Response body is correct", function () {
+        client.assert(response.body.hasOwnProperty("id"), "Cannot find 'id' field");
+        client.assert(response.body.position === "DEVELOPER", "not correct position");
+        client.assert(response.body.salary == 300.00, "not correct salary");
+        client.assert(response.body.personId == client.global.get("person_id"), "not correct personId");
+        client.assert(response.body.subdivisionId == client.global.get("subdivision_id"), "not correct subdivisionId");
+    });
+    client.global.set("employee_id", response.body.id);
+%}
+
+### Create Employee Failed
+POST {{host}}/employees
+Content-Type: application/json
+
+{
+  "position": "DEVELOPER",
+  "salary": 300.00,
+  "personId": ""
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 400, "Response status is not 400");
+    });
+%}
+
+### Get Employee By ID
+GET {{host}}/employees/{{employee_id}}
 Accept: application/json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.test("Headers option exists", function() {
+        client.assert(response.headers.valueOf("Content-Type") === "application/json", "Content type isn't JSON");
+    });
+    client.test("Response body is correct", function () {
+        client.assert(response.body.position === "DEVELOPER", "not correct position");
+        client.assert(response.body.salary == 300.00, "not correct salary");
+    });
+%}
+
+### Get All Employees
+GET {{host}}/employees
+Accept: application/json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.test("Headers option exists", function() {
+        client.assert(response.headers.valueOf("Content-Type") === "application/json", "Content type isn't JSON");
+    });
+    client.test("Response body is correct", function () {
+        var employeeId = client.global.get("employee_id");
+        var foundItem = response.body.find(function(item) {
+            if (item.id == employeeId) {
+                return item.position === "DEVELOPER" && item.salary == 300.00;
+            }
+        });
+        client.assert(foundItem, "Cannot find '" + employeeId + "' field")
+    });
+%}

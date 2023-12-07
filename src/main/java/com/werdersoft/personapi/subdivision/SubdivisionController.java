@@ -2,13 +2,16 @@ package com.werdersoft.personapi.subdivision;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/subdivisions")
 @RequiredArgsConstructor
+@Validated
 public class SubdivisionController {
 
     private final SubdivisionService subdivisionService;
@@ -27,7 +30,7 @@ public class SubdivisionController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public SubdivisionDTO createSubdivision(@RequestBody SubdivisionDTO subdivisionDTO) {
+    public SubdivisionDTO createSubdivision(@Valid @RequestBody SubdivisionDTO subdivisionDTO) {
         return subdivisionService.createSubdivision(subdivisionDTO);
     }
 

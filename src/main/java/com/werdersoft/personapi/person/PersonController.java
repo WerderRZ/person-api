@@ -2,10 +2,14 @@ package com.werdersoft.personapi.person;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping("/api/v1/persons")
 @RequiredArgsConstructor
@@ -27,13 +31,13 @@ public class PersonController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PersonDTO createPerson(@RequestBody PersonDTO personDTO) {
+    public PersonDTO createPerson(@Valid @RequestBody PersonDTO personDTO) {
         return personService.createPerson(personDTO);
     }
 
     @PutMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
-    public PersonDTO updatePersonById(@PathVariable Long id, @RequestBody PersonDTO personDTO) {
+    public PersonDTO updatePersonById(@PathVariable Long id, @Valid @RequestBody PersonDTO personDTO) {
         return personService.updatePersonById(id, personDTO);
     }
 
