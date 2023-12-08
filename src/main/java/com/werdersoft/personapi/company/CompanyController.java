@@ -24,8 +24,8 @@ public class CompanyController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CompanyDTO createCompany(@Valid @RequestBody Company company) {
-        return companyService.createCompany(company);
+    public CompanyDTO createCompany(@Valid @RequestBody CompanyDTO companyDTO) {
+        return companyService.createCompany(companyDTO);
     }
 
 }

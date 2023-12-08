@@ -31,20 +31,4 @@ public class Subdivision extends BaseEntity {
     )
     private Set<Company> companies;
 
-    public SubdivisionDTO toSubdivisionDTO() {
-        SubdivisionDTO subdivisionDTO = new SubdivisionDTO();
-        subdivisionDTO.setId(getId());
-        subdivisionDTO.setName(getName());
-
-        List<UUID> employeeIds = new ArrayList<>();
-        employees.forEach(employee -> employeeIds.add(employee.getId()));
-        subdivisionDTO.setEmployeesIds(employeeIds);
-
-        List<UUID> companyIds = new ArrayList<>();
-        companies.forEach(company -> companyIds.add(company.getId()));
-        subdivisionDTO.setCompaniesIds(companyIds);
-
-        return subdivisionDTO;
-    }
-
 }

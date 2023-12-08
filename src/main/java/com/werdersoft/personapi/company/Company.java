@@ -17,8 +17,6 @@ import java.util.Set;
 @Table(name = "company")
 public class Company extends BaseEntity {
 
-    @NotEmpty(message = "Name should not be empty")
-    @Size(min = 1, message = "Name should have at least 1 character")
     @Column(name = "name")
     private String name;
 
