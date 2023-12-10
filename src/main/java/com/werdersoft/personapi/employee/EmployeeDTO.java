@@ -2,17 +2,15 @@ package com.werdersoft.personapi.employee;
 
 import com.werdersoft.personapi.dto.BaseDTO;
 import com.werdersoft.personapi.enums.Position;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class EmployeeDTO extends BaseDTO {
 
     @NotNull(message = "Field 'position' cannot be empty")

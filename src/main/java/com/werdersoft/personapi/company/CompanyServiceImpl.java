@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.werdersoft.personapi.util.Utils.toValue;
 
@@ -21,19 +23,10 @@ public class CompanyServiceImpl implements CompanyService{
     @Lazy
     private final SubdivisionServiceImpl subdivisionService;
 
-//    public CompanyServiceImpl(CompanyRepository companyRepository,
-//                              CompanyMapper companyMapper,
-//                              @Lazy SubdivisionServiceImpl subdivisionService) {
-//        this.companyRepository = companyRepository;
-//        this.companyMapper = companyMapper;
-//        this.subdivisionService = subdivisionService;
-//    }
-
     @Override
     public List<CompanyDTO> getAllCompanies() {
-        List<CompanyDTO> companyDTOList = new ArrayList<>();
-        companyRepository.findAll().forEach(company -> companyDTOList.add(companyMapper.toCompanyDTO(company)));
-        return companyDTOList;
+        return StreamSupport.stream(companyRepository.findAll().spliterator(), false)
+                .map(companyMapper::toCompanyDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -47,10 +40,12 @@ public class CompanyServiceImpl implements CompanyService{
     }
 
     private Set<Subdivision> mapSubdivisionsIdsToSubdivisions(List<UUID> subdivisionsIds) {
-        Set<Subdivision> subdivisionSet = new HashSet<>();
         if (subdivisionsIds != null) {
-            subdivisionsIds.forEach(id -> subdivisionSet.add(subdivisionService.findSubdivisionById(id)));
+            return subdivisionsIds.stream()
+                    .map(subdivisionService::findSubdivisionById)
+                    .collect(Collectors.toSet());
+        } else {
+            return new HashSet<>();
         }
-        return subdivisionSet;
     }
 }

@@ -2,18 +2,17 @@ package com.werdersoft.personapi.company;
 
 import com.werdersoft.personapi.dto.BaseDTO;
 import com.werdersoft.personapi.enums.Region;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.UUID;
 
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class CompanyDTO extends BaseDTO {
 
     @NotBlank(message = "Name should not be empty")

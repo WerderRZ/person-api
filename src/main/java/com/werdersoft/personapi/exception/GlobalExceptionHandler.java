@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
         List<String> errorMessages = ex.getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.toList());
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), 400, errorMessages);
+        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), 400, errorMessages);
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 }

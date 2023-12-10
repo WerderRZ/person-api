@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.werdersoft.personapi.util.Utils.toValue;
 
@@ -26,9 +28,8 @@ public class SubdivisionServiceImpl implements SubdivisionService {
 
     @Override
     public List<SubdivisionDTO> getAllSubdivisions() {
-        List<SubdivisionDTO> subdivisionDTOList = new ArrayList<>();
-        subdivisionRepository.findAll().forEach(subdivision -> subdivisionDTOList.add(subdivisionMapper.toSubdivisionDTO(subdivision)));
-        return subdivisionDTOList;
+        return StreamSupport.stream(subdivisionRepository.findAll().spliterator(), false)
+                .map(subdivisionMapper::toSubdivisionDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -49,19 +50,23 @@ public class SubdivisionServiceImpl implements SubdivisionService {
     }
 
     private Set<Company> mapCompaniesIdsToCompanies(List<UUID> companiesIds) {
-        Set<Company> companySet = new HashSet<>();
         if (companiesIds != null) {
-            companiesIds.forEach(id -> companySet.add(companyService.findCompanyById(id)));
+            return companiesIds.stream()
+                    .map(companyService::findCompanyById)
+                    .collect(Collectors.toSet());
+        } else {
+            return new HashSet<>();
         }
-        return companySet;
     }
 
     private Set<Employee> mapEmployeesIdsToEmployees(List<UUID> employeesIds) {
-        Set<Employee> employeeSet = new HashSet<>();
         if (employeesIds != null) {
-            employeesIds.forEach(id -> employeeSet.add(employeeService.findEmployeeById(id)));
+            return employeesIds.stream()
+                    .map(employeeService::findEmployeeById)
+                    .collect(Collectors.toSet());
+        } else {
+            return new HashSet<>();
         }
-        return employeeSet;
     }
 
     @Autowired

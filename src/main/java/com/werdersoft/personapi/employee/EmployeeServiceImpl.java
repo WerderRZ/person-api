@@ -13,6 +13,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.werdersoft.personapi.util.Utils.toValue;
 
@@ -28,9 +30,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<EmployeeDTO> getAllEmployees() {
-        List<EmployeeDTO> employeeDTOList = new ArrayList<>();
-        employeeRepository.findAll().forEach(employee -> employeeDTOList.add(employeeMapper.toEmployeeDTO(employee)));
-        return employeeDTOList;
+        return StreamSupport.stream(employeeRepository.findAll().spliterator(), false)
+                .map(employeeMapper::toEmployeeDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
