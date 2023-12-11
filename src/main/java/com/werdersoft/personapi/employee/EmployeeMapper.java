@@ -1,13 +1,13 @@
 package com.werdersoft.personapi.employee;
 
 import com.werdersoft.personapi.person.Person;
+import com.werdersoft.personapi.person.PersonMapper;
 import com.werdersoft.personapi.subdivision.Subdivision;
-import com.werdersoft.personapi.util.Utils;
+import com.werdersoft.personapi.subdivision.SubdivisionMapper;
 import org.mapstruct.*;
 
-import java.util.UUID;
-
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+        uses = {PersonMapper.class, SubdivisionMapper.class})
 public abstract class EmployeeMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -18,13 +18,5 @@ public abstract class EmployeeMapper {
     @Mapping(target = "personId", source = "person")
     @Mapping(target = "subdivisionId", source = "subdivision")
     public abstract EmployeeDTO toEmployeeDTO(Employee employee);
-
-    public UUID mapPersonToPersonId(Person person) {
-        return Utils.mapEntityToEntityId(person);
-    }
-
-    public UUID mapSubdivisionToSubdivisionId(Subdivision subdivision) {
-        return Utils.mapEntityToEntityId(subdivision);
-    }
 
 }

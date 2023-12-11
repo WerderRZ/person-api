@@ -2,7 +2,6 @@ package com.werdersoft.personapi.subdivision;
 
 import com.werdersoft.personapi.company.Company;
 import com.werdersoft.personapi.employee.Employee;
-import com.werdersoft.personapi.util.Utils;
 import org.mapstruct.*;
 
 import java.util.List;
@@ -21,12 +20,22 @@ public abstract class SubdivisionMapper {
     public abstract Subdivision toSubdivision(SubdivisionDTO subdivisionDTO,
                                               Set<Company> companies, Set<Employee> employees);
 
-    public List<UUID> mapEmployeesToEmployeesIds(Set<Employee> employees) {
-        return Utils.mapEntitiesToEntitiesIds(employees);
+    public abstract List<UUID> toSubdivisionsIds(Set<Subdivision> subdivisions);
+
+    public UUID mapSubdivisionToId(Subdivision subdivision) {
+        return subdivision.getId();
     }
 
-    public List<UUID> mapCompaniesToCompaniesIds(Set<Company> companies) {
-        return Utils.mapEntitiesToEntitiesIds(companies);
+    public abstract List<UUID> toCompaniesIds(Set<Company> companies);
+
+    public UUID mapCompanyToId(Company company) {
+        return company.getId();
+    }
+
+    public abstract List<UUID> toEmployeesIds(Set<Employee> employees);
+
+    public UUID mapEmployeeToId(Employee employee) {
+        return employee.getId();
     }
 
 }
