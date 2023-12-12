@@ -1,0 +1,73 @@
+### Create Company
+POST {{host}}/companies
+Content-Type: application/json
+
+{
+  "name": "Werdersoft",
+  "region": "ASIA"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+    client.test("Headers option exists", function() {
+        client.assert(response.headers.valueOf("Content-Type") === "application/json", "Content type isn't JSON");
+    });
+    client.test("Response body is correct", function () {
+        client.assert(response.body.hasOwnProperty("id"), "Cannot find 'id' field");
+        client.assert(response.body.name === "Werdersoft", "not correct name");
+    });
+    client.global.set("company_id", response.body.id);
+%}
+
+### Create Company Fail (Incorrect Name)
+POST {{host}}/companies
+Content-Type: application/json
+
+{
+  "name": ""
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 400, "Response status is not 400");
+    });
+%}
+
+### Create Company Fail (Incorrect Region)
+POST {{host}}/companies
+Content-Type: application/json
+
+{
+  "name": "Se",
+  "region": "Canada"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 400, "Response status is not 400");
+    });
+%}
+
+### Get All Companies
+GET {{host}}/companies
+Accept: application/json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.test("Headers option exists", function() {
+        client.assert(response.headers.valueOf("Content-Type") === "application/json", "Content type isn't JSON");
+    });
+    client.test("Response body is correct", function () {
+        var companyId = client.global.get("company_id");
+        var foundItem = response.body.find(function(item) {
+            if (item.id == companyId) {
+                return item.name === "Werdersoft";
+            }
+        });
+        client.assert(foundItem, "Cannot find '" + companyId + "' field")
+    });
+%}

@@ -1,11 +1,15 @@
-package com.werdersoft.personapi;
+package com.werdersoft.personapi.person;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 
+@Validated
 @RestController
 @RequestMapping("/api/v1/persons")
 @RequiredArgsConstructor
@@ -15,31 +19,31 @@ public class PersonController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Person> getAllPersons() {
+    public List<PersonDTO> getAllPersons() {
         return personService.getAllPersons();
     }
 
     @GetMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Person getPersonById(@PathVariable Long id) {
+    public PersonDTO getPersonById(@PathVariable UUID id) {
         return personService.getPersonById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Person createPerson(@RequestBody Person person) {
-        return personService.createPerson(person);
+    public PersonDTO createPerson(@Valid @RequestBody PersonDTO personDTO) {
+        return personService.createPerson(personDTO);
     }
 
     @PutMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Person updatePersonById(@PathVariable Long id, @RequestBody Person person) {
-        return personService.updatePersonById(id, person);
+    public PersonDTO updatePersonById(@PathVariable UUID id, @Valid @RequestBody PersonDTO personDTO) {
+        return personService.updatePersonById(id, personDTO);
     }
 
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePersonById(@PathVariable Long id) {
+    public void deletePersonById(@PathVariable UUID id) {
         personService.deletePersonById(id);
     }
 

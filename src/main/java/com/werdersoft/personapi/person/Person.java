@@ -1,5 +1,6 @@
-package com.werdersoft.personapi;
+package com.werdersoft.personapi.person;
 
+import com.werdersoft.personapi.entity.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,12 +10,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Table(name = "person")
-public class Person {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+public class Person extends BaseEntity {
 
     @Column(name = "name")
     private String name;

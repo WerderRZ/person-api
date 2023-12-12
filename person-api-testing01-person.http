@@ -1,0 +1,142 @@
+### Create Person 1
+POST {{host}}/persons
+Content-Type: application/json
+
+{
+  "name": "Sam",
+  "age": 22
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+    client.test("Headers option exists", function() {
+        client.assert(response.headers.valueOf("Content-Type") === "application/json", "Content type isn't JSON");
+    });
+    client.test("Response body is correct", function () {
+        client.assert(response.body.hasOwnProperty("id"), "Cannot find 'id' field");
+        client.assert(response.body.name === "Sam", "not correct name");
+        client.assert(response.body.age === 22, "not correct age");
+    });
+    client.global.set("person_id", response.body.id);
+ %}
+
+### Create Person 2
+POST {{host}}/persons
+Content-Type: application/json
+
+{
+  "name": "Lake",
+  "age": 24
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+    client.test("Headers option exists", function() {
+        client.assert(response.headers.valueOf("Content-Type") === "application/json", "Content type isn't JSON");
+    });
+    client.test("Response body is correct", function () {
+        client.assert(response.body.hasOwnProperty("id"), "Cannot find 'id' field");
+        client.assert(response.body.name === "Lake", "not correct name");
+        client.assert(response.body.age === 24, "not correct age");
+    });
+    client.global.set("person2_id", response.body.id);
+%}
+
+### Create Person Fail
+POST {{host}}/persons
+Content-Type: application/json
+
+{
+  "age": -30
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 400, "Response status is not 400");
+    });
+%}
+
+### Get All Persons
+GET {{host}}/persons
+Accept: application/json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.test("Headers option exists", function() {
+        client.assert(response.headers.valueOf("Content-Type") === "application/json", "Content type isn't JSON");
+    });
+    client.test("Response body is correct", function () {
+        var personId = client.global.get("person_id");
+        var foundItem = response.body.find(function(item) {
+            if (item.id == personId) {
+                return item.name === "Sam" && item.age === 22;
+            }
+        });
+        client.assert(foundItem, "Cannot find '" + personId + "' field")
+    });
+%}
+
+### Get Person By ID
+GET {{host}}/persons/{{person_id}}
+Accept: application/json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.test("Headers option exists", function() {
+        client.assert(response.headers.valueOf("Content-Type") === "application/json", "Content type isn't JSON");
+    });
+    client.test("Response body is correct", function () {
+        client.assert(response.body.name === "Sam", "not correct name");
+        client.assert(response.body.age === 22, "not correct age");
+    });
+%}
+
+### Get Person By ID Fail
+GET {{host}}/persons/45d88674-6344-4454-aae3-a8b77c319856
+Accept: application/json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 404, "Response status is not 404");
+    });
+%}
+
+### Update Person By ID
+PUT {{host}}/persons/{{person2_id}}
+Content-Type: application/json
+
+{
+  "name": "Tom",
+  "age": 28
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.test("Headers option exists", function() {
+        client.assert(response.headers.valueOf("Content-Type") === "application/json", "Content type isn't JSON");
+    });
+    client.test("Response body is correct", function () {
+        client.assert(response.body.hasOwnProperty("id"), "Cannot find 'id' field");
+        client.assert(response.body.name === "Tom", "not correct name");
+        client.assert(response.body.age === 28, "not correct age");
+    });
+%}
+
+### Delete Person By ID
+DELETE {{host}}/persons/{{person2_id}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 204, "Response status is not 204");
+    });
+%}
