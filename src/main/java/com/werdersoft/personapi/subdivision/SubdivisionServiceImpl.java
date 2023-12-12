@@ -15,8 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static com.werdersoft.personapi.util.Utils.mapEntityToEntitiesToEntitiesIds;
-import static com.werdersoft.personapi.util.Utils.toValue;
+import static com.werdersoft.personapi.util.Utils.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +28,7 @@ public class SubdivisionServiceImpl implements SubdivisionService {
 
     @Override
     public List<SubdivisionDTO> getAllSubdivisions() {
-        return StreamSupport.stream(subdivisionRepository.findAll().spliterator(), false)
+        return getStream(subdivisionRepository.findAll())
                 .map(this::mapSubdivisionTosubdivisionDTO)
                 .collect(Collectors.toList());
     }

@@ -10,10 +10,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-import static com.werdersoft.personapi.util.Utils.mapEntityToEntitiesToEntitiesIds;
-import static com.werdersoft.personapi.util.Utils.toValue;
+import static com.werdersoft.personapi.util.Utils.*;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +24,7 @@ public class CompanyServiceImpl implements CompanyService{
 
     @Override
     public List<CompanyDTO> getAllCompanies() {
-        return StreamSupport.stream(companyRepository.findAll().spliterator(), false)
+        return getStream(companyRepository.findAll())
                 .map(company -> companyMapper.toCompanyDTO(company, mapEntityToEntitiesToEntitiesIds(company.getSubdivisions())))
                 .collect(Collectors.toList());
     }

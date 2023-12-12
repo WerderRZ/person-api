@@ -9,7 +9,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static com.werdersoft.personapi.util.Utils.*;
 
@@ -24,7 +23,7 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public List<PersonDTO> getAllPersons() {
         log.debug("Entering getAllPersons method");
-        return StreamSupport.stream(personRepository.findAll().spliterator(), false)
+        return getStream(personRepository.findAll())
                 .map(personMapper::toPersonDTO)
                 .collect(Collectors.toList());
     }

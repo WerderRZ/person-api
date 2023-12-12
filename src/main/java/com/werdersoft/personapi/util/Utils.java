@@ -6,6 +6,7 @@ import com.werdersoft.personapi.subdivision.Subdivision;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class Utils {
@@ -26,6 +27,10 @@ public class Utils {
         return entities.stream()
                 .map(BaseEntity::getId)
                 .collect(Collectors.toList());
+    }
+
+    public static <T> Stream<T> getStream(Iterable<T> iterable) {
+        return StreamSupport.stream(iterable.spliterator(), false);
     }
 
 }

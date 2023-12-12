@@ -16,6 +16,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static com.werdersoft.personapi.util.Utils.getStream;
 import static com.werdersoft.personapi.util.Utils.toValue;
 
 @Service
@@ -30,7 +31,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<EmployeeDTO> getAllEmployees() {
-        return StreamSupport.stream(employeeRepository.findAll().spliterator(), false)
+        return getStream(employeeRepository.findAll())
                 .map(employeeMapper::toEmployeeDTO)
                 .collect(Collectors.toList());
     }
