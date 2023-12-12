@@ -41,10 +41,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     public Set<Employee> findEmployeesByEmployeesIds(List<UUID> employeesIds) {
-        if (employeesIds != null) {
-            return employeeRepository.findEmployeesByEmployeesIds(employeesIds);
-        }
-        return null;
+        return employeeRepository.findEmployeesByEmployeesIds(employeesIds);
     }
 
     @Override

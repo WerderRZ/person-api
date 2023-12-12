@@ -52,10 +52,7 @@ public class SubdivisionServiceImpl implements SubdivisionService {
     }
 
     public Set<Subdivision> findSubdivisionsBySubdivisionsIds(List<UUID> subdivisionsIds) {
-        if (subdivisionsIds != null) {
-            return subdivisionRepository.findSubdivisionsBySubdivisionsIds(subdivisionsIds);
-        }
-        return null;
+        return subdivisionRepository.findSubdivisionsBySubdivisionsIds(subdivisionsIds);
     }
 
     private SubdivisionDTO mapSubdivisionTosubdivisionDTO(Subdivision subdivision) {

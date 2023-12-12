@@ -11,6 +11,6 @@ import java.util.UUID;
 @Repository
 public interface SubdivisionRepository extends CrudRepository<Subdivision, UUID> {
 
-    @Query("SELECT sub FROM Subdivision sub WHERE sub.id = :subdivisionsIds")
+    @Query("SELECT sub FROM Subdivision sub WHERE sub.id IN (:subdivisionsIds)")
     Set<Subdivision> findSubdivisionsBySubdivisionsIds(List<UUID> subdivisionsIds);
 }

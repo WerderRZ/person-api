@@ -42,10 +42,7 @@ public class CompanyServiceImpl implements CompanyService{
     }
 
     public Set<Company> findCompaniesByCompaniesIds(List<UUID> companiesIds) {
-        if (companiesIds != null) {
-            return companyRepository.findCompaniesByCompaniesIds(companiesIds);
-        }
-        return null;
+        return companyRepository.findCompaniesByCompaniesIds(companiesIds);
     }
 
     private CompanyDTO mapCompanyToCompanyDTO(Company company) {

@@ -11,7 +11,7 @@ import java.util.UUID;
 @Repository
 public interface CompanyRepository extends CrudRepository<Company, UUID> {
 
-    @Query("SELECT comp FROM Company comp WHERE comp.id = :companiesIds")
+    @Query("SELECT comp FROM Company comp WHERE comp.id in (:companiesIds)")
     Set<Company> findCompaniesByCompaniesIds(List<UUID> companiesIds);
 
 }
