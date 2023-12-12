@@ -22,4 +22,10 @@ public class Utils {
         return op.orElseThrow(() -> ex);
     }
 
+    public static <T extends BaseEntity> List<UUID> mapEntityToEntitiesToEntitiesIds(Set<T> entities) {
+        return entities.stream()
+                .map(BaseEntity::getId)
+                .collect(Collectors.toList());
+    }
+
 }

@@ -7,8 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -25,6 +24,6 @@ public class Company extends BaseEntity {
     private Region region;
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "companies")
-    private Set<Subdivision> subdivisions;
+    private Set<Subdivision> subdivisions = new HashSet<>();
 
 }

@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static com.werdersoft.personapi.util.Utils.mapEntityToEntitiesToEntitiesIds;
 import static com.werdersoft.personapi.util.Utils.toValue;
 
 @Service
@@ -29,19 +30,20 @@ public class SubdivisionServiceImpl implements SubdivisionService {
     @Override
     public List<SubdivisionDTO> getAllSubdivisions() {
         return StreamSupport.stream(subdivisionRepository.findAll().spliterator(), false)
-                .map(subdivisionMapper::toSubdivisionDTO).collect(Collectors.toList());
+                .map(this::mapSubdivisionTosubdivisionDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
     public SubdivisionDTO getSubdivisionById(UUID id) {
-        return subdivisionMapper.toSubdivisionDTO(findSubdivisionById(id));
+        return mapSubdivisionTosubdivisionDTO(findSubdivisionById(id));
     }
 
     @Override
     public SubdivisionDTO createSubdivision(SubdivisionDTO subdivisionDTO) {
-        Set<Company> companies = mapCompaniesIdsToCompanies(subdivisionDTO.getCompaniesIds());
-        Set<Employee> employees = mapEmployeesIdsToEmployees(subdivisionDTO.getEmployeesIds());
-        return subdivisionMapper.toSubdivisionDTO(subdivisionRepository
+        Set<Company> companies = companyService.findCompaniesByCompaniesIds(subdivisionDTO.getCompaniesIds());
+        Set<Employee> employees = employeeService.findEmployeesByEmployeesIds(subdivisionDTO.getEmployeesIds());
+        return mapSubdivisionTosubdivisionDTO(subdivisionRepository
                 .save(subdivisionMapper.toSubdivision(subdivisionDTO, companies, employees)));
     }
 
@@ -49,24 +51,16 @@ public class SubdivisionServiceImpl implements SubdivisionService {
         return toValue(subdivisionRepository.findById(id), new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    private Set<Company> mapCompaniesIdsToCompanies(List<UUID> companiesIds) {
-        if (companiesIds != null) {
-            return companiesIds.stream()
-                    .map(companyService::findCompanyById)
-                    .collect(Collectors.toSet());
-        } else {
-            return new HashSet<>();
+    public Set<Subdivision> findSubdivisionsBySubdivisionsIds(List<UUID> subdivisionsIds) {
+        if (subdivisionsIds != null) {
+            return subdivisionRepository.findSubdivisionsBySubdivisionsIds(subdivisionsIds);
         }
+        return null;
     }
 
-    private Set<Employee> mapEmployeesIdsToEmployees(List<UUID> employeesIds) {
-        if (employeesIds != null) {
-            return employeesIds.stream()
-                    .map(employeeService::findEmployeeById)
-                    .collect(Collectors.toSet());
-        } else {
-            return new HashSet<>();
-        }
+    private SubdivisionDTO mapSubdivisionTosubdivisionDTO(Subdivision subdivision) {
+        return subdivisionMapper.toSubdivisionDTO(subdivision, mapEntityToEntitiesToEntitiesIds(
+                subdivision.getCompanies()), mapEntityToEntitiesToEntitiesIds(subdivision.getEmployees()));
     }
 
     @Autowired

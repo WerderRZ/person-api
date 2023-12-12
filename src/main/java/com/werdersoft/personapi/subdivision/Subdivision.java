@@ -7,10 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Getter
@@ -22,13 +19,13 @@ public class Subdivision extends BaseEntity {
     private String name;
 
     @OneToMany(mappedBy = "subdivision", cascade = CascadeType.ALL)
-    private Set<Employee> employees;
+    private Set<Employee> employees = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name="\"subdivisions-companies\"",
         joinColumns = @JoinColumn(name = "subdivision_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "company_id", referencedColumnName = "id")
     )
-    private Set<Company> companies;
+    private Set<Company> companies = new HashSet<>();
 
 }

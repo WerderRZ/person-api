@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static com.werdersoft.personapi.util.Utils.mapEntityToEntitiesToEntitiesIds;
 import static com.werdersoft.personapi.util.Utils.toValue;
 
 @Service
@@ -26,26 +27,28 @@ public class CompanyServiceImpl implements CompanyService{
     @Override
     public List<CompanyDTO> getAllCompanies() {
         return StreamSupport.stream(companyRepository.findAll().spliterator(), false)
-                .map(companyMapper::toCompanyDTO).collect(Collectors.toList());
+                .map(company -> companyMapper.toCompanyDTO(company, mapEntityToEntitiesToEntitiesIds(company.getSubdivisions())))
+                .collect(Collectors.toList());
     }
 
     @Override
     public CompanyDTO createCompany(CompanyDTO companyDTO) {
-        Set<Subdivision> subdivisions = mapSubdivisionsIdsToSubdivisions(companyDTO.getSubdivisionsIds());
-        return companyMapper.toCompanyDTO(companyRepository.save(companyMapper.toCompany(companyDTO, subdivisions)));
+        Set<Subdivision> subdivisions = subdivisionService.findSubdivisionsBySubdivisionsIds(companyDTO.getSubdivisionsIds());
+        return mapCompanyToCompanyDTO(companyRepository.save(companyMapper.toCompany(companyDTO, subdivisions)));
     }
 
     public Company findCompanyById(UUID id) {
         return toValue(companyRepository.findById(id), new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    private Set<Subdivision> mapSubdivisionsIdsToSubdivisions(List<UUID> subdivisionsIds) {
-        if (subdivisionsIds != null) {
-            return subdivisionsIds.stream()
-                    .map(subdivisionService::findSubdivisionById)
-                    .collect(Collectors.toSet());
-        } else {
-            return new HashSet<>();
+    public Set<Company> findCompaniesByCompaniesIds(List<UUID> companiesIds) {
+        if (companiesIds != null) {
+            return companyRepository.findCompaniesByCompaniesIds(companiesIds);
         }
+        return null;
+    }
+
+    private CompanyDTO mapCompanyToCompanyDTO(Company company) {
+        return companyMapper.toCompanyDTO(company, mapEntityToEntitiesToEntitiesIds(company.getSubdivisions()));
     }
 }
