@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -19,6 +21,7 @@ public class PersonServiceImpl implements PersonService {
 
     private final PersonRepository personRepository;
     private final PersonMapper personMapper;
+    private final PersonDataLoading personDataLoading;
 
     @Override
     public List<PersonDTO> getAllPersons() {
@@ -54,6 +57,23 @@ public class PersonServiceImpl implements PersonService {
         log.debug("Entering deletePersonById method");
         Person findedPerson = findPersonById(id);
         personRepository.delete(findedPerson);
+    }
+
+    @Override
+    public List<PersonDTO> updatePersonsFromSiteOutSystem() {
+        List<Integer> existingIds = personRepository.findPersonsWhereExternalIdIsFilled();
+        List<Person> persons = personDataLoading.loadAllPersons(existingIds);
+        return persons.stream()
+                .map(person -> personMapper.toPersonDTO(personRepository.save(person)))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public PersonDTO downloadPersonByExternalId(Integer externalId) {
+        Person findedPerson = personRepository.findPersonByExternalID(externalId);
+        return personMapper.toPersonDTO(
+                Objects.requireNonNullElseGet(
+                        findedPerson, () -> personRepository.save(personDataLoading.loadPersonByID(externalId))));
     }
 
     public Person findPersonById(UUID id) {

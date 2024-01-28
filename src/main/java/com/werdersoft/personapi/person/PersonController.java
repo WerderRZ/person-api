@@ -47,4 +47,16 @@ public class PersonController {
         personService.deletePersonById(id);
     }
 
+    @GetMapping("/load/{externalId}")
+    @ResponseStatus(HttpStatus.OK)
+    public PersonDTO downloadPersonByExternalId(@PathVariable Integer externalId) {
+        return personService.downloadPersonByExternalId(externalId);
+    }
+
+    @GetMapping("/load")
+    @ResponseStatus(HttpStatus.OK)
+    public List<PersonDTO> updatePersonsFromSiteOutSystem() {
+        return personService.updatePersonsFromSiteOutSystem();
+    }
+
 }

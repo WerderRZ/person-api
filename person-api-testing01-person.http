@@ -140,3 +140,9 @@ DELETE {{host}}/persons/{{person2_id}}
         client.assert(response.status === 204, "Response status is not 204");
     });
 %}
+
+### Download Person By External ID
+GET {{host}}/persons/load/2
+
+### Download All Persons
+GET {{host}}/persons/load
