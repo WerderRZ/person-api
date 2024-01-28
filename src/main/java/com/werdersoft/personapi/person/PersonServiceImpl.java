@@ -62,7 +62,9 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public List<PersonDTO> updatePersonsFromSiteOutSystem() {
         List<Integer> existingIds = personRepository.findPersonsWhereExternalIdIsFilled();
+        //TODO: Маппинг для преобразования DTO от API в Person
         List<Person> persons = personDataLoading.loadAllPersons(existingIds);
+        //TODO: За один раз сохранять данные
         return persons.stream()
                 .map(person -> personMapper.toPersonDTO(personRepository.save(person)))
                 .collect(Collectors.toList());
@@ -71,6 +73,7 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public PersonDTO downloadPersonByExternalId(Integer externalId) {
         Person findedPerson = personRepository.findPersonByExternalID(externalId);
+        //TODO: Заменить на Optional
         return personMapper.toPersonDTO(
                 Objects.requireNonNullElseGet(
                         findedPerson, () -> personRepository.save(personDataLoading.loadPersonByID(externalId))));

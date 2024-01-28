@@ -3,6 +3,33 @@ Connection: Keep-Alive
 User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
 Accept-Encoding: br,deflate,gzip,x-gzip
 
+<> 2024-01-28T212132.200.json
+
+###
+
+GET http://localhost:8080/api/v1/persons/load
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2024-01-28T212115.200.json
+
+###
+
+GET http://localhost:8080/api/v1/persons/load/2
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2024-01-28T211707.200.json
+
+###
+
+GET http://localhost:8080/api/v1/persons/load
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
 <> 2024-01-28T204652.200.json
 
 ###
@@ -555,50 +582,6 @@ Accept-Encoding: br,deflate,gzip,x-gzip
 }
 
 <> 2023-12-13T001237.500.json
-
-###
-
-POST http://localhost:8080/api/v1/companies
-Content-Type: application/json
-Content-Length: 47
-Connection: Keep-Alive
-User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
-Accept-Encoding: br,deflate,gzip,x-gzip
-
-{
-  "name": "Werdersoft3",
-  "region": "ASIA"
-}
-
-<> 2023-12-13T001233.201.json
-
-###
-
-GET http://localhost:8080/api/v1/subdivisions
-Accept: application/json
-Connection: Keep-Alive
-User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
-Accept-Encoding: br,deflate,gzip,x-gzip
-
-<> 2023-12-13T001047.200.json
-
-###
-
-POST http://localhost:8080/api/v1/subdivisions
-Content-Type: application/json
-Content-Length: 86
-Connection: Keep-Alive
-User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.9)
-Accept-Encoding: br,deflate,gzip,x-gzip
-
-{
-  "name": "IT",
-  "companiesIds": [
-    "e7955638-bcdf-40ca-8236-7e78b305d02f"
-  ]
-}
-
-<> 2023-12-13T001037.201.json
 
 ###
 

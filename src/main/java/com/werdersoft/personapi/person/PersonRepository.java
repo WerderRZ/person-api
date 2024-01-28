@@ -10,6 +10,7 @@ import java.util.UUID;
 @Repository
 public interface PersonRepository extends CrudRepository<Person, UUID> {
 
+    //TODO: Обернуть ответ в Optional
     Person findPersonByExternalID(Integer externalID);
 
     @Query("SELECT per.externalID FROM Person per WHERE per.externalID IS NOT NULL")

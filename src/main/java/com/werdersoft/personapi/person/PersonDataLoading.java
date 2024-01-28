@@ -10,28 +10,35 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO: ReqresClient
 @Component
 @Slf4j
 public class PersonDataLoading {
 
+    //TODO: Вынести в application.properties
     final private String externalServiceUrl = "https://reqres.in/api/users";
 
+    //TODO: getPersonByID
+    //TODO: Нужно возвращать DTO АПИ
     public Person loadPersonByID(Integer externalId) {
 
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = new RestTemplate(); //Заменить на WebClient и DI
 
-        // Выполнение HTTP-запроса
+        //TODO: Выполнение HTTP-запроса
         ResponseEntity<String> response =
                 restTemplate.getForEntity(externalServiceUrl + "/" + externalId, String.class);
+        //TODO: Написать DTO-класс для тела ответа внешнего API и ответ принимать в экземпляр этого класса
+        //TODO: Object Mapper И JSON Node не требуются
         ObjectMapper objectMapper = new ObjectMapper();
 
         Person person = new Person();
+        //TODO: Преобразование внешнего класса в Person маппингом
 
-        // Обработка ответа
+        //TODO: Обработка ответа
+        //TODO: Написать аспект для обработки ошибок
         if (response.getStatusCode().is2xxSuccessful()) {
 
             String responseBody = response.getBody();
-            System.out.println("Ответ от сервера: " + responseBody);
 
             try {
                 // Преобразование JSON-строки в объект JsonNode
@@ -54,6 +61,7 @@ public class PersonDataLoading {
 
     }
 
+    //TODO: getPersons
     public List<Person> loadAllPersons(List<Integer> existingIds) {
 
         RestTemplate restTemplate = new RestTemplate();
@@ -66,7 +74,6 @@ public class PersonDataLoading {
 
         if (response.getStatusCode().is2xxSuccessful()) {
             String responseBody = response.getBody();
-            System.out.println("Ответ от сервера: " + responseBody);
 
             try {
                 // Преобразование JSON-строки в объект JsonNode
