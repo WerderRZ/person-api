@@ -26,6 +26,7 @@ dependencies {
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    compileOnly("org.springframework.boot:spring-boot-starter-webflux")
 
     // Dev Tools
     implementation("org.mapstruct:mapstruct:1.5.5.Final")

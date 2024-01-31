@@ -1,5 +1,7 @@
 package com.werdersoft.personapi.person;
 
+import com.werdersoft.personapi.reqres.ReqresService;
+import com.werdersoft.personapi.reqres.ReqresUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -7,12 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.werdersoft.personapi.util.Utils.*;
+import static com.werdersoft.personapi.util.Utils.getStream;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +22,7 @@ public class PersonServiceImpl implements PersonService {
 
     private final PersonRepository personRepository;
     private final PersonMapper personMapper;
-    private final PersonDataLoading personDataLoading;
+    private final ReqresService reqresService;
 
     @Override
     public List<PersonDTO> getAllPersons() {
@@ -62,21 +63,27 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public List<PersonDTO> updatePersonsFromSiteOutSystem() {
         List<Integer> existingIds = personRepository.findPersonsWhereExternalIdIsFilled();
-        //TODO: Маппинг для преобразования DTO от API в Person
-        List<Person> persons = personDataLoading.loadAllPersons(existingIds);
-        //TODO: За один раз сохранять данные
-        return persons.stream()
-                .map(person -> personMapper.toPersonDTO(personRepository.save(person)))
+        List<ReqresUser> reqresUsers = reqresService.getAllPersons().stream()
+                .filter(user -> !existingIds.contains(user.getId()))
+                .collect(Collectors.toList());
+
+        Iterable<Person> persons = personRepository.saveAll(personMapper.toPersonsListFromReqresUsersList(reqresUsers));
+
+        return getStream(persons)
+                .map(personMapper::toPersonDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public PersonDTO downloadPersonByExternalId(Integer externalId) {
-        Person findedPerson = personRepository.findPersonByExternalID(externalId);
-        //TODO: Заменить на Optional
-        return personMapper.toPersonDTO(
-                Objects.requireNonNullElseGet(
-                        findedPerson, () -> personRepository.save(personDataLoading.loadPersonByID(externalId))));
+        PersonDTO personDTO = null;
+        if (personRepository.findPersonByExternalID(externalId).isEmpty()) {
+            ReqresUser reqresUser = reqresService.getPersonById(externalId);
+            personDTO = personMapper.toPersonDTO(
+                            personRepository.save(
+                                personMapper.toPersonFromReqresUser(reqresUser)));
+        }
+        return personDTO;
     }
 
     public Person findPersonById(UUID id) {
