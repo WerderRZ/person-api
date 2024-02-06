@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.werdersoft.personapi.util.Utils.*;
-import static com.werdersoft.personapi.util.Utils.getStream;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +27,7 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public List<PersonDTO> getAllPersons() {
         log.debug("Entering getAllPersons method");
-        return getStream(personRepository.findAll())
+        return personRepository.findAll().stream()
                 .map(personMapper::toPersonDTO)
                 .collect(Collectors.toList());
     }
@@ -67,23 +67,23 @@ public class PersonServiceImpl implements PersonService {
                 .filter(user -> !existingIds.contains(user.getId()))
                 .collect(Collectors.toList());
 
-        Iterable<Person> persons = personRepository.saveAll(personMapper.toPersonsListFromReqresUsersList(reqresUsers));
+        List<Person> persons = personRepository.saveAll(personMapper.toPersonsListFromReqresUsersList(reqresUsers));
 
-        return getStream(persons)
+        return persons.stream()
                 .map(personMapper::toPersonDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public PersonDTO downloadPersonByExternalId(Integer externalId) {
-        PersonDTO personDTO = null;
-        if (personRepository.findPersonByExternalID(externalId).isEmpty()) {
+        Optional<Person> foundPerson = personRepository.findPersonByExternalID(externalId);
+        if (foundPerson.isPresent()) {
+            return personMapper.toPersonDTO(foundPerson.get());
+        } else {
             ReqresUser reqresUser = reqresService.getPersonById(externalId);
-            personDTO = personMapper.toPersonDTO(
-                            personRepository.save(
-                                personMapper.toPersonFromReqresUser(reqresUser)));
+            return personMapper.toPersonDTO(personRepository.save(
+                    personMapper.toPersonFromReqresUser(reqresUser)));
         }
-        return personDTO;
     }
 
     public Person findPersonById(UUID id) {

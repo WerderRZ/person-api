@@ -1,48 +1,50 @@
 package com.werdersoft.personapi.reqres;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 
-@Service
+@Component
 @Slf4j
+@RequiredArgsConstructor
 public class ReqresService {
 
-    private final  WebClient.Builder builder = WebClient.builder();
+    private final WebClient webClient;
 
     @Value("${reqres.url-get-by-id}")
-    private String urlGetById;
+    private String URI_GET_BY_ID;
 
     @Value("${reqres.url-get-list}")
-    private String urlGetList;
+    private String URI_GET_LIST;
 
     public ReqresUser getPersonById(Integer externalId) {
 
-        ReqresSingleUser reqresSingleUser = builder.build()
+        ReqresSingleUserDTO reqresSingleUserDTO = webClient
                 .get()
-                .uri(urlGetById + externalId)
+                .uri(URI_GET_BY_ID + externalId)
                 .retrieve()
-                .bodyToMono(ReqresSingleUser.class)
-//                .doOnError(error -> new getError(error.))
+                .bodyToMono(ReqresSingleUserDTO.class)
                 .block();
-        //TODO: Как обработать ситуацию, когда reqresSingleUser может быть null
-        return reqresSingleUser.getData();
+
+        return reqresSingleUserDTO.getData();
 
     }
 
     public List<ReqresUser> getAllPersons() {
 
-        ReqresListUsers reqresListUsers = builder.build()
+        ReqresUsersDTO reqresUsersDTO = webClient
                 .get()
-                .uri(urlGetList)
+                .uri(URI_GET_LIST)
                 .retrieve()
-                .bodyToMono(ReqresListUsers.class)
+                .bodyToMono(ReqresUsersDTO.class)
                 .block();
 
-        return reqresListUsers.getData();
+        return reqresUsersDTO.getData();
 
     }
 

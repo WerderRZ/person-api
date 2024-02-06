@@ -30,7 +30,6 @@ dependencies {
 
     // Dev Tools
     implementation("org.mapstruct:mapstruct:1.5.5.Final")
-    implementation("com.fasterxml.jackson.core:jackson-databind")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
     annotationProcessor("org.projectlombok:lombok")
@@ -43,6 +42,9 @@ dependencies {
 
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    // Logging
+    implementation("net.ttddyy:datasource-proxy:1.8.1")
 }
 
 tasks.withType<Test> {

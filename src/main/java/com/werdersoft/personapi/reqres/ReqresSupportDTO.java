@@ -1,6 +1,9 @@
 package com.werdersoft.personapi.reqres;
 
-public class ReqresSupport {
+import lombok.Data;
+
+@Data
+public class ReqresSupportDTO {
     private String url;
     private String text;
 }

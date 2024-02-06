@@ -1,15 +1,15 @@
 package com.werdersoft.personapi.reqres;
 
-import lombok.Getter;
+import lombok.Data;
 
 import java.util.List;
 
-@Getter
-public class ReqresListUsers {
+@Data
+public class ReqresUsersDTO {
     private Integer page;
     private Integer per_page;
     private Integer total;
     private Integer total_pages;
     private List<ReqresUser> data;
-    private ReqresSupport support;
+    private ReqresSupportDTO support;
 }

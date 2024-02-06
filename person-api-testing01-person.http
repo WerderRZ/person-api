@@ -142,7 +142,7 @@ DELETE {{host}}/persons/{{person2_id}}
 %}
 
 ### Download Person By External ID
-GET {{host}}/persons/load/2
+GET {{host}}/persons/load/456
 
 ### Download All Persons
 GET {{host}}/persons/load

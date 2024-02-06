@@ -24,7 +24,7 @@ public class CompanyServiceImpl implements CompanyService{
 
     @Override
     public List<CompanyDTO> getAllCompanies() {
-        return getStream(companyRepository.findAll())
+        return companyRepository.findAll().stream()
                 .map(company -> companyMapper.toCompanyDTO(company, mapEntityToEntitiesToEntitiesIds(company.getSubdivisions())))
                 .collect(Collectors.toList());
     }

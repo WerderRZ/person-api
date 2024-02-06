@@ -1,9 +1,8 @@
 package com.werdersoft.personapi.reqres;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
+@Data
 public class ReqresUser {
     private Integer id;
     private String email;
