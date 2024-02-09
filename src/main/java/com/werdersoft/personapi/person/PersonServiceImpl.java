@@ -1,6 +1,6 @@
 package com.werdersoft.personapi.person;
 
-import com.werdersoft.personapi.reqres.ReqresService;
+import com.werdersoft.personapi.reqres.ReqresClient;
 import com.werdersoft.personapi.reqres.ReqresUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class PersonServiceImpl implements PersonService {
 
     private final PersonRepository personRepository;
     private final PersonMapper personMapper;
-    private final ReqresService reqresService;
+    private final ReqresClient reqresClient;
 
     @Override
     public List<PersonDTO> getAllPersons() {
@@ -63,7 +63,7 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public List<PersonDTO> updatePersonsFromSiteOutSystem() {
         List<Integer> existingIds = personRepository.findPersonsWhereExternalIdIsFilled();
-        List<ReqresUser> reqresUsers = reqresService.getAllPersons().stream()
+        List<ReqresUser> reqresUsers = reqresClient.getAllPersons().stream()
                 .filter(user -> !existingIds.contains(user.getId()))
                 .collect(Collectors.toList());
 
@@ -80,7 +80,7 @@ public class PersonServiceImpl implements PersonService {
         if (foundPerson.isPresent()) {
             return personMapper.toPersonDTO(foundPerson.get());
         } else {
-            ReqresUser reqresUser = reqresService.getPersonById(externalId);
+            ReqresUser reqresUser = reqresClient.getPersonById(externalId);
             return personMapper.toPersonDTO(personRepository.save(
                     personMapper.toPersonFromReqresUser(reqresUser)));
         }
