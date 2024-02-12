@@ -48,10 +48,6 @@ public class PersonControllerTest {
         expectedPersonDTO.setName("Sam");
         expectedPersonDTO.setAge(22);
 
-        //when(personService.getPersonById(id)).thenReturn(expectedPersonDTO);
-        Mockito.doReturn(expectedPersonDTO).when(personService).getPersonById(id);
-        //PersonDTO res = personService.getPersonById(id);
-
         // act
         var actualResponseDTO = webTestClient
                 .get()
@@ -83,7 +79,7 @@ public class PersonControllerTest {
         expectedPersonDTO.setName("Sam");
         expectedPersonDTO.setAge(22);
 
-        when(personService.createPerson(actualPersonDTO)).thenReturn(expectedPersonDTO);
+        //when(personService.createPerson(actualPersonDTO)).thenReturn(expectedPersonDTO);
 
         // act
         var actualResponseDTO = webTestClient
@@ -97,9 +93,7 @@ public class PersonControllerTest {
                 .getResponseBody();
 
         // assert
-        assertThat(actualResponseDTO).isNotNull();
-        assertThat(actualResponseDTO.getName()).isNotBlank().isEqualTo(expectedPersonDTO.getName());
-        assertThat(actualResponseDTO.getAge()).isEqualTo(expectedPersonDTO.getAge());
+        assertThat(actualResponseDTO).isEqualTo(expectedPersonDTO);
 
     }
 
