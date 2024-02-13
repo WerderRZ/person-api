@@ -1,13 +1,9 @@
 package com.werdersoft.personapi.util;
 
-import com.werdersoft.personapi.dto.BaseDTO;
 import com.werdersoft.personapi.entity.BaseEntity;
-import com.werdersoft.personapi.subdivision.Subdivision;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public class Utils {
     private Utils() {
