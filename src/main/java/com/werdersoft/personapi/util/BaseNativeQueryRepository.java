@@ -41,7 +41,6 @@ public class BaseNativeQueryRepository {
                         sum.addAndGet(Arrays.stream(executed).sum());
                     }
                 } catch (SQLException e) {
-                    System.out.println(e.getMessage());
                     log.error("An exception occurred when working with Prepared Statement", e.getMessage());
                 }
             });
