@@ -78,7 +78,7 @@ public class PersonServiceImpl implements PersonService {
         preparedPersons.forEach(person -> person.setId(UUID.randomUUID()));
 
         if (!preparedPersons.isEmpty()) {
-            personDB.saveBatchOfPersons(preparedPersons);
+            personDB.savePersonsInBatches_OneQuery(preparedPersons);
         }
 
         List<Person> persons = personRepository.findPersonsByIds(
