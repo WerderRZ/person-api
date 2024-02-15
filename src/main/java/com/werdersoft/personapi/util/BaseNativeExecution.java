@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
 @Slf4j
-public class BaseNativeQueryRepository {
+public class BaseNativeExecution {
     private static final int BATCH_SIZE = 3;
 
     public static <T> Integer batchProcess(EntityManager entityManager, List<T> items,

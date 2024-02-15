@@ -3,19 +3,14 @@ package com.werdersoft.personapi.person;
 import com.werdersoft.personapi.entity.BaseEntity;
 import com.werdersoft.personapi.reqres.ReqresClient;
 import com.werdersoft.personapi.reqres.ReqresUser;
-import com.werdersoft.personapi.util.BaseNativeQueryRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import static com.werdersoft.personapi.util.Utils.*;
@@ -28,7 +23,7 @@ public class PersonServiceImpl implements PersonService {
     private final PersonRepository personRepository;
     private final PersonMapper personMapper;
     private final ReqresClient reqresClient;
-    private final PersonDB personDB;
+    private final PersonRepositoryExtended personRepositoryExtended;
 
     @Override
     public List<PersonDTO> getAllPersons() {
@@ -78,7 +73,7 @@ public class PersonServiceImpl implements PersonService {
         preparedPersons.forEach(person -> person.setId(UUID.randomUUID()));
 
         if (!preparedPersons.isEmpty()) {
-            personDB.savePersonsInBatches_OneQuery(preparedPersons);
+            personRepositoryExtended.savePersonsInBatches_OneQuery(preparedPersons);
         }
 
         List<Person> persons = personRepository.findPersonsByIds(

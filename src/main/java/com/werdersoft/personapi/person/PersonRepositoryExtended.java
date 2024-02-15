@@ -1,10 +1,10 @@
 package com.werdersoft.personapi.person;
 
-import com.werdersoft.personapi.util.BaseNativeQueryRepository;
+import com.werdersoft.personapi.util.BaseNativeExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-@Component
-public class PersonDB {
+@Repository
+public class PersonRepositoryExtended {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -46,7 +46,7 @@ public class PersonDB {
             }
         };
 
-        int savedRows = BaseNativeQueryRepository.batchProcess(entityManager, persons, query, biConsumer);
+        int savedRows = BaseNativeExecution.batchProcess(entityManager, persons, query, biConsumer);
         if (savedRows != persons.size()) {
             throw new RuntimeException("not saved in DB rows: " + (persons.size() - savedRows));
         }
