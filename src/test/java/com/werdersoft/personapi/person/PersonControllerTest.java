@@ -25,7 +25,7 @@ public class PersonControllerTest {
     private String apiPath;
 
     @BeforeEach
-    void beforeEach() {
+    void prepare() {
         apiPath = "/api/v1/persons";
     }
 
@@ -50,6 +50,7 @@ public class PersonControllerTest {
         // assert
         assertThat(actualResponseDTO).isNotNull();
         assertThat(actualResponseDTO.getName()).isNotBlank().isEqualTo(actualPersonDTO.getName());
+
         assertThat(actualResponseDTO.getAge()).isEqualTo(actualPersonDTO.getAge());
 
     }
@@ -130,12 +131,7 @@ public class PersonControllerTest {
                 .getResponseBody();
 
         // assert
-        assertThat(actualResponseDTO).isNotNull();
-        PersonDTO findedPersonDTO = actualResponseDTO.stream()
-                .filter(personDTO -> personDTO.getId().equals(id))
-                .findFirst()
-                .orElse(null);
-        assertThat(findedPersonDTO).isEqualTo(expectedPersonDTO);
+        assertThat(actualResponseDTO).contains(expectedPersonDTO);
 
     }
 
@@ -188,9 +184,5 @@ public class PersonControllerTest {
         testPersonDTO.setAge(22);
         return testPersonDTO;
     }
-
-
-
-
 
 }
