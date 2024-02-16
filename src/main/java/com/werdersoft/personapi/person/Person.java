@@ -18,4 +18,10 @@ public class Person extends BaseEntity {
     @Column(name = "age")
     private Integer age;
 
+    @Column(name = "external_id")
+    private Integer externalID;
+
+    @Column(name = "email")
+    private String email;
+
 }

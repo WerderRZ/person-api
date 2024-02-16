@@ -4,6 +4,7 @@ import com.werdersoft.personapi.dto.BaseDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.persistence.Column;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -18,5 +19,9 @@ public class PersonDTO extends BaseDTO {
 
     @Min(value = 0, message = "Age should be greater than 0")
     private Integer age;
+
+    private Integer externalID;
+
+    private String email;
 
 }

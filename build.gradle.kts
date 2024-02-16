@@ -26,6 +26,7 @@ dependencies {
     // Spring
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    compileOnly("org.springframework.boot:spring-boot-starter-webflux")
 
     // Dev Tools
     implementation("org.mapstruct:mapstruct:1.5.5.Final")
@@ -37,10 +38,13 @@ dependencies {
     // Database
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.liquibase:liquibase-core")
-    runtimeOnly("org.postgresql:postgresql")
+    implementation("org.postgresql:postgresql")
 
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    // Logging
+    implementation("net.ttddyy:datasource-proxy:1.8.1")
 }
 
 tasks.withType<Test> {

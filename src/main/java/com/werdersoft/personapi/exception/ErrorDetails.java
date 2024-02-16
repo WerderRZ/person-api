@@ -12,10 +12,12 @@ public class ErrorDetails {
     private LocalDateTime timestamp;
     private Integer status;
     private List<String> errors;
+    private String context;
 
-    public ErrorDetails(LocalDateTime timestamp, Integer status, List<String> errors) {
-        this.timestamp = timestamp;
+    public ErrorDetails(Integer status, List<String> errors, String context) {
+        this.timestamp = LocalDateTime.now();
         this.status = status;
         this.errors = errors;
+        this.context = context;
     }
 }

@@ -28,7 +28,7 @@ public class SubdivisionServiceImpl implements SubdivisionService {
 
     @Override
     public List<SubdivisionDTO> getAllSubdivisions() {
-        return getStream(subdivisionRepository.findAll())
+        return subdivisionRepository.findAll().stream()
                 .map(this::mapSubdivisionTosubdivisionDTO)
                 .collect(Collectors.toList());
     }
