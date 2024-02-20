@@ -1,0 +1,1 @@
+INSERT INTO person(id, name, age) VALUES (?, ?, ?)

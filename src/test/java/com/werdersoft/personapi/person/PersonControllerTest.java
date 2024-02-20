@@ -1,28 +1,54 @@
 package com.werdersoft.personapi.person;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import com.werdersoft.personapi.exception.ErrorDetails;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DisplayName("Тесты rest-контроллера PersonController")
+@Testcontainers
 public class PersonControllerTest {
+
+    @Container
+    static PostgreSQLContainer<?> postgreSQLContainer =
+            new PostgreSQLContainer<>(DockerImageName.parse("postgres:16"));
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
+    }
 
     @Autowired
     private WebTestClient webTestClient;
 
     @Autowired
-    private PersonService personService;
+    private JdbcTemplate jdbcTemplate;
 
     private String apiPath;
+
+    @BeforeAll
+    static void beforeAll() {
+        postgreSQLContainer.start();
+    }
 
     @BeforeEach
     void prepare() {
@@ -31,45 +57,61 @@ public class PersonControllerTest {
 
     @Test
     @DisplayName("POST - Успешное cоздание Person")
-    public void createPersonSuccess() throws Exception {
+    public void createPersonSuccess() {
 
         // arrange
-        PersonDTO actualPersonDTO = getTestPerson();
+        PersonDTO expectedPersonDTO = getTestPersonDTO();
+        Person expectedPerson = getTestPerson();
+        PersonDTO requestPersonDTO = getTestPersonDTO();
 
-        // act
+        // act & assert
         var actualResponseDTO = webTestClient
                 .post()
                 .uri(apiPath)
-                .body(Mono.just(actualPersonDTO), PersonDTO.class)
+                .body(Mono.just(requestPersonDTO), PersonDTO.class)
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(PersonDTO.class)
                 .returnResult()
                 .getResponseBody();
 
-        // assert
         assertThat(actualResponseDTO).isNotNull();
-        assertThat(actualResponseDTO.getName()).isNotBlank().isEqualTo(actualPersonDTO.getName());
+        UUID id = actualResponseDTO.getId();
 
-        assertThat(actualResponseDTO.getAge()).isEqualTo(actualPersonDTO.getAge());
+        Person actualPerson = getPersonsById(id).get(0);
+
+        expectedPersonDTO.setId(id);
+        assertThat(actualResponseDTO).isEqualTo(expectedPersonDTO);
+
+        expectedPerson.setId(id);
+        assertThat(actualPerson).isEqualTo(expectedPerson);
 
     }
 
     @Test
     @DisplayName("POST - Провальное cоздание Person")
-    public void createPersonFail() throws Exception {
+    public void createPersonFail() {
 
         // arrange
-        PersonDTO actualPersonDTO = getTestPerson();
-        actualPersonDTO.setAge(-30);
+        PersonDTO requestPersonDTO = getTestPersonDTO();
+        requestPersonDTO.setAge(-30);
 
-        // act  & assert
+        // act
         var actualResponseDTO = webTestClient
                 .post()
                 .uri(apiPath)
-                .body(Mono.just(actualPersonDTO), PersonDTO.class)
+                .body(Mono.just(requestPersonDTO), PersonDTO.class)
                 .exchange()
-                .expectStatus().isBadRequest();
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorDetails.class)
+                .returnResult()
+                .getResponseBody();
+
+        // assert
+        assertThat(actualResponseDTO).isNotNull();
+        assertThat(actualResponseDTO.getStatus()).isEqualTo(400);
+        assertThat(actualResponseDTO.getErrors()).isNotEmpty();
+        //TODO Обработка ErrorDetails после слияния
 
     }
 
@@ -78,8 +120,11 @@ public class PersonControllerTest {
     public void getPersonByIdSuccess() throws Exception {
 
         // arrange
-        PersonDTO expectedPersonDTO = personService.createPerson(getTestPerson());
-        UUID id = expectedPersonDTO.getId();
+        UUID id = UUID.randomUUID();
+        addRecordByEntity(id);
+
+        PersonDTO expectedPersonDTO = getTestPersonDTO();
+        expectedPersonDTO.setId(id);
 
         // act
         var actualResponseDTO = webTestClient
@@ -117,8 +162,14 @@ public class PersonControllerTest {
     public void getAllPersonsSuccess() throws Exception {
 
         // arrange
-        PersonDTO expectedPersonDTO = personService.createPerson(getTestPerson());
-        UUID id = expectedPersonDTO.getId();
+        deleteAllRecords();
+        UUID id = UUID.randomUUID();
+        addRecordByEntity(id);
+
+        List<PersonDTO> expectedPersonsList = new ArrayList<>();
+        PersonDTO personDTO = getTestPersonDTO();
+        personDTO.setId(id);
+        expectedPersonsList.add(personDTO);
 
         // act
         var actualResponseDTO = webTestClient
@@ -131,7 +182,7 @@ public class PersonControllerTest {
                 .getResponseBody();
 
         // assert
-        assertThat(actualResponseDTO).contains(expectedPersonDTO);
+        assertThat(actualResponseDTO).isEqualTo(expectedPersonsList);
 
     }
 
@@ -140,8 +191,15 @@ public class PersonControllerTest {
     public void updatePersonByIdSuccess() throws Exception {
 
         // arrange
-        PersonDTO expectedPersonDTO = personService.createPerson(getTestPerson());
-        UUID id = expectedPersonDTO.getId();
+        UUID id = UUID.randomUUID();
+        addRecordByEntity(id);
+        Person expectedPerson = new Person();
+        expectedPerson.setId(id);
+        expectedPerson.setName("Tom");
+        expectedPerson.setAge(28);
+
+        PersonDTO expectedPersonDTO = getTestPersonDTO();
+        expectedPersonDTO.setId(id);
         expectedPersonDTO.setName("Tom");
         expectedPersonDTO.setAge(28);
 
@@ -155,9 +213,11 @@ public class PersonControllerTest {
                 .expectBody(PersonDTO.class)
                 .returnResult()
                 .getResponseBody();
+        Person actualPerson = getPersonsById(id).get(0);
 
         // assert
         assertThat(actualResponseDTO).isEqualTo(expectedPersonDTO);
+        assertThat(actualPerson).isEqualTo(expectedPerson);
 
     }
 
@@ -166,8 +226,8 @@ public class PersonControllerTest {
     public void deletePersonByIdSuccess() throws Exception {
 
         // arrange
-        PersonDTO expectedPersonDTO = personService.createPerson(getTestPerson());
-        UUID id = expectedPersonDTO.getId();
+        UUID id = UUID.randomUUID();
+        addRecordByEntity(id);
 
         //act & assert
         var actualResponseDTO = webTestClient
@@ -175,14 +235,59 @@ public class PersonControllerTest {
                 .uri(apiPath+ "/" + id)
                 .exchange()
                 .expectStatus().isNoContent();
+        List<Person> actualPerson = getPersonsById(id);
+
+        // assert
+        assertThat(actualPerson).isEmpty();
 
     }
 
-    private PersonDTO getTestPerson() {
+    private PersonDTO getTestPersonDTO() {
         PersonDTO testPersonDTO = new PersonDTO();
         testPersonDTO.setName("Sam");
         testPersonDTO.setAge(22);
         return testPersonDTO;
+    }
+
+    private Person getTestPerson() {
+        Person testPerson = new Person();
+        testPerson.setName("Sam");
+        testPerson.setAge(22);
+        return testPerson;
+    }
+
+    private void addRecordByEntity(UUID id) {
+        String sql = "INSERT INTO person(id, name, age) VALUES (?, ?, ?)";
+        jdbcTemplate.update(sql, preparedStatement -> {
+            preparedStatement.setObject(1, id);
+            preparedStatement.setString(2, "Sam");
+            preparedStatement.setInt(3, 22);
+        });
+    }
+
+    private void deleteAllRecords() {
+        String sql = "DELETE from person";
+        jdbcTemplate.execute(sql);
+    }
+
+    private List<Person> getPersonsById(UUID id) {
+        String sql = "SELECT * FROM person WHERE id = ?";
+        try {
+            return jdbcTemplate.query(sql, ps -> ps.setObject(1, id), (resultSet, i) -> {
+                Person person = new Person();
+                person.setId(resultSet.getObject(1, UUID.class));
+                person.setName(resultSet.getString(2));
+                person.setAge(resultSet.getInt(3));
+                return person;
+            });
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @AfterAll
+    static void afterAll() {
+        postgreSQLContainer.stop();
     }
 
 }
