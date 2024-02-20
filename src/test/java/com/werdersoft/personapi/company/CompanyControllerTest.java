@@ -1,48 +1,50 @@
 package com.werdersoft.personapi.company;
 
 import com.werdersoft.personapi.enums.Region;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import com.werdersoft.personapi.exception.ErrorDetails;
+import com.werdersoft.personapi.initializer.Postgres;
+import com.werdersoft.personapi.util.JsonFileReaderService;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DisplayName("Тесты rest-контроллера CompanyController")
-@Testcontainers
+@ContextConfiguration(initializers = {Postgres.Initializer.class})
 public class CompanyControllerTest {
-
-    @Container
-    static PostgreSQLContainer<?> postgreSQLContainer =
-            new PostgreSQLContainer<>(DockerImageName.parse("postgres:16"));
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
-        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
-    }
 
     @Autowired
     private WebTestClient webTestClient;
 
     @Autowired
-    private CompanyService companyService;
+    private JsonFileReaderService jsonFileReaderService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private String apiPath;
+
+    @BeforeAll
+    static void beforeAll() {
+        Postgres.container.start();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        Postgres.container.stop();
+    }
 
     @BeforeEach
     void prepare() {
@@ -54,23 +56,31 @@ public class CompanyControllerTest {
     public void createCompanySuccess() throws Exception {
 
         // arrange
-        CompanyDTO actualCompanyDTO = getTestCompanyDTO();
+        CompanyDTO expectedCompanyDTO = getTestCompanyDTO();
+        Company expectedCompany = getTestCompany();
+        CompanyDTO requestCompanyDTO = getTestCompanyDTO();
 
-        // act
+        // act & assert
         var actualResponseDTO = webTestClient
                 .post()
                 .uri(apiPath)
-                .body(Mono.just(actualCompanyDTO), CompanyDTO.class)
+                .body(Mono.just(requestCompanyDTO), CompanyDTO.class)
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(CompanyDTO.class)
                 .returnResult()
                 .getResponseBody();
 
-        // assert
         assertThat(actualResponseDTO).isNotNull();
-        assertThat(actualResponseDTO.getName()).isNotBlank().isEqualTo(actualCompanyDTO.getName());
-        assertThat(actualResponseDTO.getRegion()).isEqualTo(actualCompanyDTO.getRegion());
+        UUID id = actualResponseDTO.getId();
+
+        Company actualCompany = getCompaniesById(id).get(0);
+
+        expectedCompanyDTO.setId(id);
+        assertThat(actualResponseDTO).isEqualTo(expectedCompanyDTO);
+
+        expectedCompany.setId(id);
+        assertThat(actualCompany).isEqualTo(expectedCompany);
 
     }
 
@@ -82,13 +92,21 @@ public class CompanyControllerTest {
         CompanyDTO actualCompanyDTO = getTestCompanyDTO();
         actualCompanyDTO.setName("");
 
-        // act  & assert
+        // act
         var actualResponseDTO = webTestClient
                 .post()
                 .uri(apiPath)
                 .body(Mono.just(actualCompanyDTO), CompanyDTO.class)
                 .exchange()
-                .expectStatus().isBadRequest();
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorDetails.class)
+                .returnResult()
+                .getResponseBody();
+
+        // assert
+        assertThat(actualResponseDTO).isNotNull();
+        assertThat(actualResponseDTO.getStatus()).isEqualTo(400);
+        assertThat(actualResponseDTO.getErrors()).isNotEmpty();
 
     }
 
@@ -97,7 +115,8 @@ public class CompanyControllerTest {
     public void createCompanyFail_IncorrectRegion() throws Exception {
 
         // arrange
-        String JSONRequest = "{\"name\": \"Sam\",\"region\": \"Canada\"}";
+        String JSONRequest =
+                jsonFileReaderService.readJsonFile("requests/create-company-with-wrong-region.json");
 
         // act  & assert
         var actualResponseDTO = webTestClient
@@ -115,8 +134,14 @@ public class CompanyControllerTest {
     public void getAllPersonsSuccess() throws Exception {
 
         // arrange
-        CompanyDTO expectedCompanyDTO = companyService.createCompany(getTestCompanyDTO());
-        UUID id = expectedCompanyDTO.getId();
+        deleteAllRecords();
+        UUID id = UUID.randomUUID();
+        addRecordByEntity(id);
+
+        List<CompanyDTO> expectedCompaniesList = new ArrayList<>();
+        CompanyDTO companyDTO = getTestCompanyDTO();
+        companyDTO.setId(id);
+        expectedCompaniesList.add(companyDTO);
 
         // act
         var actualResponseDTO = webTestClient
@@ -129,7 +154,7 @@ public class CompanyControllerTest {
                 .getResponseBody();
 
         // assert
-        assertThat(actualResponseDTO).contains(expectedCompanyDTO);
+        assertThat(actualResponseDTO).isEqualTo(expectedCompaniesList);
 
     }
 
@@ -137,7 +162,44 @@ public class CompanyControllerTest {
         CompanyDTO testCompanyDTO = new CompanyDTO();
         testCompanyDTO.setName("Werdersoft");
         testCompanyDTO.setRegion(Region.ASIA);
+        testCompanyDTO.setSubdivisionsIds(new ArrayList<>());
         return testCompanyDTO;
+    }
+
+    private Company getTestCompany() {
+        Company testCompany = new Company();
+        testCompany.setName("Werdersoft");
+        testCompany.setRegion(Region.ASIA);
+        return testCompany;
+    }
+
+    private List<Company> getCompaniesById(UUID id) {
+        String sql = "SELECT * FROM company WHERE id = ?";
+        try {
+            return jdbcTemplate.query(sql, ps -> ps.setObject(1, id), (resultSet, i) -> {
+                Company company = new Company();
+                company.setId(resultSet.getObject(1, UUID.class));
+                company.setName(resultSet.getString(2));
+                company.setRegion(Region.valueOf(resultSet.getString(3)));
+                return company;
+            });
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void deleteAllRecords() {
+        String sql = "DELETE from company";
+        jdbcTemplate.execute(sql);
+    }
+
+    private void addRecordByEntity(UUID id) {
+        String sql = "INSERT INTO company(id, name, region) VALUES (?, ?, ?)";
+        jdbcTemplate.update(sql, preparedStatement -> {
+            preparedStatement.setObject(1, id);
+            preparedStatement.setString(2, "Werdersoft");
+            preparedStatement.setString(3, "ASIA");
+        });
     }
 
 }

@@ -1,18 +1,14 @@
 package com.werdersoft.personapi.person;
 
 import com.werdersoft.personapi.exception.ErrorDetails;
+import com.werdersoft.personapi.initializer.Postgres;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -23,19 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DisplayName("Тесты rest-контроллера PersonController")
-@Testcontainers
+@ContextConfiguration(initializers = {Postgres.Initializer.class})
 public class PersonControllerTest {
-
-    @Container
-    static PostgreSQLContainer<?> postgreSQLContainer =
-            new PostgreSQLContainer<>(DockerImageName.parse("postgres:16"));
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
-        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
-    }
 
     @Autowired
     private WebTestClient webTestClient;
@@ -47,12 +32,17 @@ public class PersonControllerTest {
 
     @BeforeAll
     static void beforeAll() {
-        postgreSQLContainer.start();
+        Postgres.container.start();
     }
 
     @BeforeEach
     void prepare() {
         apiPath = "/api/v1/persons";
+    }
+
+    @AfterAll
+    static void afterAll() {
+        Postgres.container.stop();
     }
 
     @Test
@@ -283,11 +273,6 @@ public class PersonControllerTest {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @AfterAll
-    static void afterAll() {
-        postgreSQLContainer.stop();
     }
 
 }
