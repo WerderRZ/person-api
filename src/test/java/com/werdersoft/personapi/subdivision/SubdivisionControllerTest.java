@@ -1,89 +1,120 @@
 package com.werdersoft.personapi.subdivision;
 
-import com.werdersoft.personapi.company.CompanyDTO;
-import com.werdersoft.personapi.company.CompanyService;
-import com.werdersoft.personapi.enums.Region;
+import com.werdersoft.personapi.util.ClassFactoryUtils;
+import com.werdersoft.personapi.util.DBQueriesUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DisplayName("Тесты rest-контроллера SubdivisionController")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Testcontainers
 public class SubdivisionControllerTest {
+
+    @Container
+    private static PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:16");
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", container::getJdbcUrl);
+        registry.add("spring.datasource.username", container::getUsername);
+        registry.add("spring.datasource.password", container::getPassword);
+    }
 
     @Autowired
     private WebTestClient webTestClient;
 
     @Autowired
-    private CompanyService companyService;
+    private DBQueriesUtils dbQueriesUtils;
 
-    @Autowired
-    private SubdivisionService subdivisionService;
-
-    private String apiPath;
-
-    private CompanyDTO testCompanyDTO;
+    private final String API_PATH = "/api/v1/subdivisions";
 
     @BeforeAll
-    void init() {
-        CompanyDTO companyDTO = new CompanyDTO();
-        companyDTO.setName("Werdersoft");
-        companyDTO.setRegion(Region.ASIA);
-        testCompanyDTO = companyService.createCompany(companyDTO);
+    static void init() {
+        container.start();
     }
 
     @BeforeEach
     void prepare() {
-        apiPath = "/api/v1/subdivisions";
+        dbQueriesUtils.deleteAllRecords();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        container.stop();
     }
 
     @Test
     @DisplayName("POST - Успешное cоздание Subdivision")
-    public void createSubdivisionSuccess() throws Exception {
+    public void createSubdivisionSuccess() {
 
         // arrange
-        SubdivisionDTO actualSubdivisionDTO = getTestSubdivisionDTO();
-        UUID companyId = testCompanyDTO.getId();
+        UUID companyId = UUID.randomUUID();
+        dbQueriesUtils.addRecordCompanyWithId(companyId);
+
+        SubdivisionDTO requestSubdivisionDTO = ClassFactoryUtils.newSubdivisionDTO(companyId);
+        requestSubdivisionDTO.setEmployeesIds(null);
+        SubdivisionDTO expectedSubdivisionDTOAnswer = ClassFactoryUtils.newSubdivisionDTO(companyId);
+        Subdivision expectedSubdivisionEntity = ClassFactoryUtils.newSubdivision();
 
         // act
         var actualResponseDTO = webTestClient
                 .post()
-                .uri(apiPath)
-                .body(Mono.just(actualSubdivisionDTO), SubdivisionDTO.class)
+                .uri(API_PATH)
+                .body(Mono.just(requestSubdivisionDTO), SubdivisionDTO.class)
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(SubdivisionDTO.class)
                 .returnResult()
                 .getResponseBody();
 
+        UUID id = actualResponseDTO.getId();
+        Subdivision actualSubdivisionEntity= dbQueriesUtils.selectSubdivisionById(id).get(0);
+        Map<UUID, UUID> expectedSubdivisionCompanyMap = ClassFactoryUtils.newSubdivisionCompanyMap(companyId, id);
+        Map<UUID, UUID> actualSubdivisionsCompaniesMap =
+                dbQueriesUtils.selectSubdivisionsCompaniesRowsById(id, companyId).get(0);
+
         // assert
-        assertThat(actualResponseDTO).isNotNull();
-        assertThat(actualResponseDTO.getName()).isNotBlank().isEqualTo(actualSubdivisionDTO.getName());
-        assertThat(actualResponseDTO.getCompaniesIds()).contains(companyId);
+        expectedSubdivisionDTOAnswer.setId(id);
+        assertThat(actualResponseDTO).isEqualTo(expectedSubdivisionDTOAnswer);
+
+        expectedSubdivisionEntity.setId(id);
+        assertThat(actualSubdivisionEntity).isEqualTo(expectedSubdivisionEntity);
+
+        assertThat(actualSubdivisionsCompaniesMap).isEqualTo(expectedSubdivisionCompanyMap);
 
     }
 
     @Test
     @DisplayName("GET - Успешное получение Subdivision по ID")
-    public void getPersonByIdSuccess() throws Exception {
+    public void getSubdivisionByIdSuccess() {
 
         // arrange
-        SubdivisionDTO expectedSubdivisionDTO = subdivisionService.createSubdivision(getTestSubdivisionDTO());
-        UUID id = expectedSubdivisionDTO.getId();
+        UUID companyId = UUID.randomUUID();
+        UUID id = UUID.randomUUID();
+
+        dbQueriesUtils.addRecordCompanyWithId(companyId);
+        dbQueriesUtils.addRecordSubdivisionWithId(id);
+        dbQueriesUtils.addRecordSubdivisionCompanyWithIds(id, companyId);
+
+        SubdivisionDTO expectedSubdivisionDTOAnswer = ClassFactoryUtils.newSubdivisionDTO(companyId);
+        expectedSubdivisionDTOAnswer.setId(id);
 
         // act
         var actualResponseDTO = webTestClient
                 .get()
-                .uri(apiPath + "/" + id)
+                .uri(API_PATH + "/" + id)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(SubdivisionDTO.class)
@@ -91,22 +122,30 @@ public class SubdivisionControllerTest {
                 .getResponseBody();
 
         // assert
-        assertThat(actualResponseDTO).isEqualTo(expectedSubdivisionDTO);
+        assertThat(actualResponseDTO).isEqualTo(expectedSubdivisionDTOAnswer);
 
     }
 
     @Test
     @DisplayName("GET - Получение всех Subdivision")
-    public void getAllSubdivisionsSuccess() throws Exception {
+    public void getAllSubdivisionsSuccess() {
 
         // arrange
-        SubdivisionDTO expectedSubdivisionDTO = subdivisionService.createSubdivision(getTestSubdivisionDTO());
-        UUID id = expectedSubdivisionDTO.getId();
+        UUID companyId = UUID.randomUUID();
+        UUID id = UUID.randomUUID();
+
+        dbQueriesUtils.addRecordCompanyWithId(companyId);
+        dbQueriesUtils.addRecordSubdivisionWithId(id);
+        dbQueriesUtils.addRecordSubdivisionCompanyWithIds(id, companyId);
+
+        SubdivisionDTO subdivisionDTO = ClassFactoryUtils.newSubdivisionDTO(companyId);
+        subdivisionDTO.setId(id);
+        List<SubdivisionDTO> expectedSubdivisionsListAnswer = List.of(subdivisionDTO);
 
         // act
         var actualResponseDTO = webTestClient
                 .get()
-                .uri(apiPath)
+                .uri(API_PATH)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(SubdivisionDTO.class)
@@ -114,18 +153,8 @@ public class SubdivisionControllerTest {
                 .getResponseBody();
 
         // assert
-        assertThat(actualResponseDTO).contains(expectedSubdivisionDTO);
+        assertThat(actualResponseDTO).isEqualTo(expectedSubdivisionsListAnswer);
 
-    }
-
-    private SubdivisionDTO getTestSubdivisionDTO() {
-        List<UUID> companiesIds = new ArrayList<>();
-        companiesIds.add(testCompanyDTO.getId());
-
-        SubdivisionDTO testSubdivisionDTO = new SubdivisionDTO();
-        testSubdivisionDTO.setName("IT");
-        testSubdivisionDTO.setCompaniesIds(companiesIds);
-        return testSubdivisionDTO;
     }
 
 }

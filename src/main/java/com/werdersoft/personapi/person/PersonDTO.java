@@ -1,12 +1,15 @@
 package com.werdersoft.personapi.person;
 
 import com.werdersoft.personapi.dto.BaseDTO;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -18,5 +21,12 @@ public class PersonDTO extends BaseDTO {
 
     @Min(value = 0, message = "Age should be greater than 0")
     private Integer age;
+
+    @Builder
+    public PersonDTO(UUID id, String name, Integer age) {
+        super(id);
+        this.name = name;
+        this.age = age;
+    }
 
 }

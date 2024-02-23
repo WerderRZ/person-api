@@ -1,21 +1,22 @@
 package com.werdersoft.personapi.employee;
 
-import com.werdersoft.personapi.company.CompanyDTO;
-import com.werdersoft.personapi.company.CompanyService;
-import com.werdersoft.personapi.enums.Position;
-import com.werdersoft.personapi.enums.Region;
-import com.werdersoft.personapi.person.PersonDTO;
-import com.werdersoft.personapi.person.PersonService;
-import com.werdersoft.personapi.subdivision.SubdivisionDTO;
-import com.werdersoft.personapi.subdivision.SubdivisionService;
+import com.werdersoft.personapi.exception.ErrorDetails;
+import com.werdersoft.personapi.exception.ErrorDetailsUtils;
+import com.werdersoft.personapi.util.ClassFactoryUtils;
+import com.werdersoft.personapi.util.DBQueriesUtils;
+import com.werdersoft.personapi.util.FileUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Mono;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,96 +24,140 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DisplayName("Тесты rest-контроллера EmployeeController")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Testcontainers
 public class EmployeeControllerTest {
+
+    @Container
+    private static PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:16");
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", container::getJdbcUrl);
+        registry.add("spring.datasource.username", container::getUsername);
+        registry.add("spring.datasource.password", container::getPassword);
+    }
 
     @Autowired
     private WebTestClient webTestClient;
 
     @Autowired
-    private PersonService personService;
+    private DBQueriesUtils dbQueriesUtils;
 
     @Autowired
-    private CompanyService companyService;
+    private FileUtils fileUtils;
 
-    @Autowired
-    private SubdivisionService subdivisionService;
-
-    @Autowired
-    private EmployeeService employeeService;
-
-    private String apiPath;
-
-    private PersonDTO testPersonDTO;
-
-    private SubdivisionDTO testSubdivisionDTO;
+    private final String API_PATH = "/api/v1/employees";
 
     @BeforeAll
-    void init() {
-        CompanyDTO companyDTO = new CompanyDTO();
-        companyDTO.setName("Werdersoft");
-        companyDTO.setRegion(Region.ASIA);
-        CompanyDTO testCompanyDTO = companyService.createCompany(companyDTO);
-        List<UUID> companiesIds = new ArrayList<>();
-        companiesIds.add(testCompanyDTO.getId());
-
-        SubdivisionDTO subdivisionDTO = new SubdivisionDTO();
-        subdivisionDTO.setName("IT");
-        subdivisionDTO.setCompaniesIds(companiesIds);
-        testSubdivisionDTO = subdivisionService.createSubdivision(subdivisionDTO);
+    static void init() {
+        container.start();
     }
 
     @BeforeEach
     void prepare() {
-        apiPath = "/api/v1/employees";
+        dbQueriesUtils.deleteAllRecords();
+    }
 
-        PersonDTO personDTO = new PersonDTO();
-        personDTO.setName("Sam");
-        personDTO.setAge(20);
-        testPersonDTO = personService.createPerson(personDTO);
+    @AfterAll
+    static void afterAll() {
+        container.stop();
     }
 
     @Test
     @DisplayName("POST - Успешное cоздание Employee")
-    public void createEmployeeSuccess() throws Exception {
+    public void createEmployeeSuccess() {
 
         // arrange
-        EmployeeDTO actualEmployeeDTO = getTestEmployeeDTO();
-        UUID personId = testPersonDTO.getId();
-        UUID subdivisionId = testSubdivisionDTO.getId();
+        UUID personId = UUID.randomUUID();
+        UUID companyId = UUID.randomUUID();
+        UUID subdivisionId = UUID.randomUUID();
+
+        dbQueriesUtils.addRecordPersonWithId(personId);
+        dbQueriesUtils.addRecordCompanyWithId(companyId);
+        dbQueriesUtils.addRecordSubdivisionWithId(subdivisionId);
+        dbQueriesUtils.addRecordSubdivisionCompanyWithIds(subdivisionId, companyId);
+
+        EmployeeDTO requestEmployeeDTO = ClassFactoryUtils.newEmployeeDTO(personId, subdivisionId);
+        EmployeeDTO expectedEmployeeDTOAnswer = ClassFactoryUtils.newEmployeeDTO(personId, subdivisionId);
+        EmployeeDTO expectedEmployeeEntity = ClassFactoryUtils.newEmployeeDTO(personId, subdivisionId);
 
         // act
         var actualResponseDTO = webTestClient
                 .post()
-                .uri(apiPath)
-                .body(Mono.just(actualEmployeeDTO), EmployeeDTO.class)
+                .uri(API_PATH)
+                .body(Mono.just(requestEmployeeDTO), EmployeeDTO.class)
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(EmployeeDTO.class)
                 .returnResult()
                 .getResponseBody();
 
+        UUID id = actualResponseDTO.getId();
+        EmployeeDTO actualEmployeeEntity= dbQueriesUtils.selectEmployeeById(id).get(0);
+
         // assert
-        assertThat(actualResponseDTO).isNotNull();
-        assertThat(actualResponseDTO.getPosition()).isEqualTo(actualEmployeeDTO.getPosition());
-        assertThat(actualResponseDTO.getPersonId()).isEqualTo(personId);
-        assertThat(actualResponseDTO.getSubdivisionId()).isEqualTo(subdivisionId);
+        expectedEmployeeDTOAnswer.setId(id);
+        assertThat(actualResponseDTO).isEqualTo(expectedEmployeeDTOAnswer);
+
+        expectedEmployeeEntity.setId(id);
+        assertThat(actualEmployeeEntity).isEqualTo(expectedEmployeeEntity);
+
+    }
+
+    @Test
+    @DisplayName("POST - Создание Employee - пустые person и subdivision")
+    public void createEmployeeFail() throws Exception {
+
+        // arrange
+        String JSONRequest = fileUtils.readFile("requests/create-employee-with-empty-person.json");
+
+        ErrorDetails expectedErrorDetailsAnswer =
+                ErrorDetailsUtils.newErrorDetails400Check(List.of(
+                        "Field 'personId' cannot be empty",
+                        "Field 'subdivisionId' cannot be empty"
+                ));
+
+        // act
+        var actualResponseDTO = webTestClient
+                .post()
+                .uri(API_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(JSONRequest)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorDetails.class)
+                .returnResult()
+                .getResponseBody();
+
+        // assert
+        actualResponseDTO.setTimestamp(null);
+        assertThat(actualResponseDTO).isEqualTo(expectedErrorDetailsAnswer);
 
     }
 
     @Test
     @DisplayName("GET - Успешное получение Employee по ID")
-    public void getEmployeeByIdSuccess() throws Exception {
+    public void getEmployeeByIdSuccess() {
 
         // arrange
-        EmployeeDTO employeeDTO = getTestEmployeeDTO();
-        EmployeeDTO expectedEmployeeDTO = employeeService.createEmployee(employeeDTO);
-        UUID id = expectedEmployeeDTO.getId();
+        UUID personId = UUID.randomUUID();
+        UUID companyId = UUID.randomUUID();
+        UUID subdivisionId = UUID.randomUUID();
+        UUID id = UUID.randomUUID();
+
+        dbQueriesUtils.addRecordPersonWithId(personId);
+        dbQueriesUtils.addRecordCompanyWithId(companyId);
+        dbQueriesUtils.addRecordSubdivisionWithId(subdivisionId);
+        dbQueriesUtils.addRecordSubdivisionCompanyWithIds(subdivisionId, companyId);
+        dbQueriesUtils.addRecordEmployeeWithId(id, personId, subdivisionId);
+
+        EmployeeDTO expectedEmployeeDTOAnswer = ClassFactoryUtils.newEmployeeDTO(personId, subdivisionId);
+        expectedEmployeeDTOAnswer.setId(id);
 
         // act
         var actualResponseDTO = webTestClient
                 .get()
-                .uri(apiPath + "/" + id)
+                .uri(API_PATH + "/" + id)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(EmployeeDTO.class)
@@ -120,20 +165,43 @@ public class EmployeeControllerTest {
                 .getResponseBody();
 
         // assert
-        assertThat(actualResponseDTO).isEqualTo(expectedEmployeeDTO);
+        assertThat(actualResponseDTO).isEqualTo(expectedEmployeeDTOAnswer);
 
     }
 
+    @Test
+    @DisplayName("GET - Получение всех Employee")
+    public void getAllEmployeesSuccess() {
 
+        // arrange
+        UUID personId = UUID.randomUUID();
+        UUID companyId = UUID.randomUUID();
+        UUID subdivisionId = UUID.randomUUID();
+        UUID id = UUID.randomUUID();
 
-    private EmployeeDTO getTestEmployeeDTO() {
-        EmployeeDTO testEmployeeDTO = new EmployeeDTO();
-        testEmployeeDTO.setPosition(Position.MANAGER);
-        testEmployeeDTO.setSalary(new BigDecimal(300));
-        testEmployeeDTO.setPersonId(testPersonDTO.getId());
-        testEmployeeDTO.setSubdivisionId(testSubdivisionDTO.getId());
-        return testEmployeeDTO;
+        dbQueriesUtils.addRecordPersonWithId(personId);
+        dbQueriesUtils.addRecordCompanyWithId(companyId);
+        dbQueriesUtils.addRecordSubdivisionWithId(subdivisionId);
+        dbQueriesUtils.addRecordSubdivisionCompanyWithIds(subdivisionId, companyId);
+        dbQueriesUtils.addRecordEmployeeWithId(id, personId, subdivisionId);
+
+        EmployeeDTO employeeDTO = ClassFactoryUtils.newEmployeeDTO(personId, subdivisionId);
+        employeeDTO.setId(id);
+        List<EmployeeDTO> expectedEmployeesListAnswer = List.of(employeeDTO);
+
+        // act
+        var actualResponseDTO = webTestClient
+                .get()
+                .uri(API_PATH)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(EmployeeDTO.class)
+                .returnResult()
+                .getResponseBody();
+
+        // assert
+        assertThat(actualResponseDTO).isEqualTo(expectedEmployeesListAnswer);
+
     }
-
 
 }

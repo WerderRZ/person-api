@@ -3,6 +3,7 @@ package com.werdersoft.personapi.subdivision;
 import com.werdersoft.personapi.company.Company;
 import com.werdersoft.personapi.employee.Employee;
 import com.werdersoft.personapi.entity.BaseEntity;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,5 +28,15 @@ public class Subdivision extends BaseEntity {
         inverseJoinColumns = @JoinColumn(name = "company_id", referencedColumnName = "id")
     )
     private Set<Company> companies = new HashSet<>();
+
+    public Subdivision() {}
+
+    @Builder
+    public Subdivision(UUID id, String name, Set<Employee> employees, Set<Company> companies) {
+        super(id);
+        this.name = name;
+        this.employees = employees;
+        this.companies = companies;
+    }
 
 }

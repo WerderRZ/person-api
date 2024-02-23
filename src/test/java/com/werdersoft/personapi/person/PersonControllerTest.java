@@ -1,17 +1,21 @@
 package com.werdersoft.personapi.person;
 
 import com.werdersoft.personapi.exception.ErrorDetails;
-import com.werdersoft.personapi.initializer.Postgres;
+import com.werdersoft.personapi.exception.ErrorDetailsUtils;
+import com.werdersoft.personapi.util.ClassFactoryUtils;
+import com.werdersoft.personapi.util.DBQueriesUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,30 +23,42 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DisplayName("Тесты rest-контроллера PersonController")
-@ContextConfiguration(initializers = {Postgres.Initializer.class})
+@ActiveProfiles("test")
+@Testcontainers
+// TODO Создать application-test.properties c настройками datasource
 public class PersonControllerTest {
+
+    @Container
+    private static PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:16");
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", container::getJdbcUrl);
+        registry.add("spring.datasource.username", container::getUsername);
+        registry.add("spring.datasource.password", container::getPassword);
+    }
 
     @Autowired
     private WebTestClient webTestClient;
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private DBQueriesUtils dbQueriesUtils;
 
-    private String apiPath;
+    private final String API_PATH = "/api/v1/persons";;
 
     @BeforeAll
     static void beforeAll() {
-        Postgres.container.start();
+        container.start();
     }
 
     @BeforeEach
     void prepare() {
-        apiPath = "/api/v1/persons";
+        dbQueriesUtils.deleteAllRecords();
     }
 
     @AfterAll
     static void afterAll() {
-        Postgres.container.stop();
+        container.stop();
     }
 
     @Test
@@ -50,14 +66,14 @@ public class PersonControllerTest {
     public void createPersonSuccess() {
 
         // arrange
-        PersonDTO expectedPersonDTO = getTestPersonDTO();
-        Person expectedPerson = getTestPerson();
-        PersonDTO requestPersonDTO = getTestPersonDTO();
+        PersonDTO requestPersonDTO = ClassFactoryUtils.newPersonDTO();
+        PersonDTO expectedPersonDTOAnswer = ClassFactoryUtils.newPersonDTO();
+        Person expectedPersonEntity = ClassFactoryUtils.newPerson();
 
-        // act & assert
+        // act
         var actualResponseDTO = webTestClient
                 .post()
-                .uri(apiPath)
+                .uri(API_PATH)
                 .body(Mono.just(requestPersonDTO), PersonDTO.class)
                 .exchange()
                 .expectStatus().isCreated()
@@ -65,16 +81,15 @@ public class PersonControllerTest {
                 .returnResult()
                 .getResponseBody();
 
-        assertThat(actualResponseDTO).isNotNull();
         UUID id = actualResponseDTO.getId();
+        Person actualPersonEntity = dbQueriesUtils.selectPersonsById(id).get(0);
 
-        Person actualPerson = getPersonsById(id).get(0);
+        // assert
+        expectedPersonDTOAnswer.setId(id);
+        assertThat(actualResponseDTO).isEqualTo(expectedPersonDTOAnswer);
 
-        expectedPersonDTO.setId(id);
-        assertThat(actualResponseDTO).isEqualTo(expectedPersonDTO);
-
-        expectedPerson.setId(id);
-        assertThat(actualPerson).isEqualTo(expectedPerson);
+        expectedPersonEntity.setId(id);
+        assertThat(actualPersonEntity).isEqualTo(expectedPersonEntity);
 
     }
 
@@ -83,13 +98,15 @@ public class PersonControllerTest {
     public void createPersonFail() {
 
         // arrange
-        PersonDTO requestPersonDTO = getTestPersonDTO();
+        PersonDTO requestPersonDTO = ClassFactoryUtils.newPersonDTO();
         requestPersonDTO.setAge(-30);
+        ErrorDetails expectedErrorDetailsAnswer =
+                ErrorDetailsUtils.newErrorDetails400Check(List.of("Age should be greater than 0"));
 
         // act
         var actualResponseDTO = webTestClient
                 .post()
-                .uri(apiPath)
+                .uri(API_PATH)
                 .body(Mono.just(requestPersonDTO), PersonDTO.class)
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -98,28 +115,26 @@ public class PersonControllerTest {
                 .getResponseBody();
 
         // assert
-        assertThat(actualResponseDTO).isNotNull();
-        assertThat(actualResponseDTO.getStatus()).isEqualTo(400);
-        assertThat(actualResponseDTO.getErrors()).isNotEmpty();
-        //TODO Обработка ErrorDetails после слияния
+        actualResponseDTO.setTimestamp(null);
+        assertThat(actualResponseDTO).isEqualTo(expectedErrorDetailsAnswer);
+        // TODO Обработка ErrorDetails после слияния
 
     }
 
     @Test
     @DisplayName("GET - Успешное получение Person по ID")
-    public void getPersonByIdSuccess() throws Exception {
+    public void getPersonByIdSuccess() {
 
         // arrange
         UUID id = UUID.randomUUID();
-        addRecordByEntity(id);
-
-        PersonDTO expectedPersonDTO = getTestPersonDTO();
-        expectedPersonDTO.setId(id);
+        PersonDTO expectedPersonDTOAnswer = ClassFactoryUtils.newPersonDTO();
+        expectedPersonDTOAnswer.setId(id);
+        dbQueriesUtils.addRecordPersonWithId(id);
 
         // act
         var actualResponseDTO = webTestClient
                 .get()
-                .uri(apiPath + "/" + id)
+                .uri(API_PATH + "/" + id)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(PersonDTO.class)
@@ -127,44 +142,51 @@ public class PersonControllerTest {
                 .getResponseBody();
 
         // assert
-        assertThat(actualResponseDTO).isEqualTo(expectedPersonDTO);
+        assertThat(actualResponseDTO).isEqualTo(expectedPersonDTOAnswer);
 
     }
 
     @Test
     @DisplayName("GET - Провальное получение Person по ID")
-    public void getPersonByIdFail() throws Exception {
+    public void getPersonByIdFail() {
 
         // arrange
         UUID failId = UUID.randomUUID();
+        String uri = API_PATH + "/" + failId;
+        ErrorDetails expectedErrorDetailsAnswer = ErrorDetailsUtils.newErrorDetails404IncorrectURI(uri);
 
-        // act & assert
+        // act
         var actualResponseDTO = webTestClient
                 .get()
-                .uri(apiPath + "/" + failId)
+                .uri(uri)
                 .exchange()
-                .expectStatus().isNotFound();
+                .expectStatus().isNotFound()
+                .expectBody(ErrorDetails.class)
+                .returnResult()
+                .getResponseBody();
+
+        // assert
+        actualResponseDTO.setTimestamp(null);
+        assertThat(actualResponseDTO).isEqualTo(expectedErrorDetailsAnswer);
 
     }
 
     @Test
     @DisplayName("GET - Получение всех Person")
-    public void getAllPersonsSuccess() throws Exception {
+    public void getAllPersonsSuccess() {
 
         // arrange
-        deleteAllRecords();
         UUID id = UUID.randomUUID();
-        addRecordByEntity(id);
+        dbQueriesUtils.addRecordPersonWithId(id);
 
-        List<PersonDTO> expectedPersonsList = new ArrayList<>();
-        PersonDTO personDTO = getTestPersonDTO();
+        PersonDTO personDTO = ClassFactoryUtils.newPersonDTO();
         personDTO.setId(id);
-        expectedPersonsList.add(personDTO);
+        List<PersonDTO> expectedPersonsListAnswer = List.of(personDTO);
 
         // act
         var actualResponseDTO = webTestClient
                 .get()
-                .uri(apiPath)
+                .uri(API_PATH)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(PersonDTO.class)
@@ -172,107 +194,59 @@ public class PersonControllerTest {
                 .getResponseBody();
 
         // assert
-        assertThat(actualResponseDTO).isEqualTo(expectedPersonsList);
+        assertThat(actualResponseDTO).isEqualTo(expectedPersonsListAnswer);
 
     }
 
     @Test
     @DisplayName("UPDATE - Обновление Person по ID")
-    public void updatePersonByIdSuccess() throws Exception {
+    public void updatePersonByIdSuccess() {
 
         // arrange
         UUID id = UUID.randomUUID();
-        addRecordByEntity(id);
-        Person expectedPerson = new Person();
-        expectedPerson.setId(id);
-        expectedPerson.setName("Tom");
-        expectedPerson.setAge(28);
 
-        PersonDTO expectedPersonDTO = getTestPersonDTO();
-        expectedPersonDTO.setId(id);
-        expectedPersonDTO.setName("Tom");
-        expectedPersonDTO.setAge(28);
+        PersonDTO requestPersonDTO = PersonDTO.builder().name("Tom").age(28).build();
+        PersonDTO expectedPersonDTOAnswer = PersonDTO.builder().id(id).name("Tom").age(28).build();
+        dbQueriesUtils.addRecordPersonWithId(id);
+        Person expectedPersonEntity = Person.builder().id(id).name("Tom").age(28).build();
 
         //act
         var actualResponseDTO = webTestClient
                 .put()
-                .uri(apiPath+ "/" + id)
-                .body(Mono.just(expectedPersonDTO), PersonDTO.class)
+                .uri(API_PATH + "/" + id)
+                .body(Mono.just(requestPersonDTO), PersonDTO.class)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(PersonDTO.class)
                 .returnResult()
                 .getResponseBody();
-        Person actualPerson = getPersonsById(id).get(0);
+        Person actualPersonEntity = dbQueriesUtils.selectPersonsById(id).get(0);
 
         // assert
-        assertThat(actualResponseDTO).isEqualTo(expectedPersonDTO);
-        assertThat(actualPerson).isEqualTo(expectedPerson);
+        assertThat(actualResponseDTO).isEqualTo(expectedPersonDTOAnswer);
+        assertThat(actualPersonEntity).isEqualTo(expectedPersonEntity);
 
     }
 
     @Test
     @DisplayName("DELETE - Удаление Person по ID")
-    public void deletePersonByIdSuccess() throws Exception {
+    public void deletePersonByIdSuccess() {
 
         // arrange
         UUID id = UUID.randomUUID();
-        addRecordByEntity(id);
+        dbQueriesUtils.addRecordPersonWithId(id);
 
-        //act & assert
+        //act
         var actualResponseDTO = webTestClient
                 .delete()
-                .uri(apiPath+ "/" + id)
+                .uri(API_PATH + "/" + id)
                 .exchange()
                 .expectStatus().isNoContent();
-        List<Person> actualPerson = getPersonsById(id);
+        List<Person> actualPersonEntity = dbQueriesUtils.selectPersonsById(id);
 
         // assert
-        assertThat(actualPerson).isEmpty();
+        assertThat(actualPersonEntity).isEmpty();
 
-    }
-
-    private PersonDTO getTestPersonDTO() {
-        PersonDTO testPersonDTO = new PersonDTO();
-        testPersonDTO.setName("Sam");
-        testPersonDTO.setAge(22);
-        return testPersonDTO;
-    }
-
-    private Person getTestPerson() {
-        Person testPerson = new Person();
-        testPerson.setName("Sam");
-        testPerson.setAge(22);
-        return testPerson;
-    }
-
-    private void addRecordByEntity(UUID id) {
-        String sql = "INSERT INTO person(id, name, age) VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql, preparedStatement -> {
-            preparedStatement.setObject(1, id);
-            preparedStatement.setString(2, "Sam");
-            preparedStatement.setInt(3, 22);
-        });
-    }
-
-    private void deleteAllRecords() {
-        String sql = "DELETE from person";
-        jdbcTemplate.execute(sql);
-    }
-
-    private List<Person> getPersonsById(UUID id) {
-        String sql = "SELECT * FROM person WHERE id = ?";
-        try {
-            return jdbcTemplate.query(sql, ps -> ps.setObject(1, id), (resultSet, i) -> {
-                Person person = new Person();
-                person.setId(resultSet.getObject(1, UUID.class));
-                person.setName(resultSet.getString(2));
-                person.setAge(resultSet.getInt(3));
-                return person;
-            });
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

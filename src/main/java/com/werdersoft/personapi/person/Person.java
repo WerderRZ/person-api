@@ -1,10 +1,12 @@
 package com.werdersoft.personapi.person;
 
 import com.werdersoft.personapi.entity.BaseEntity;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -17,5 +19,14 @@ public class Person extends BaseEntity {
 
     @Column(name = "age")
     private Integer age;
+
+    public Person() {}
+
+    @Builder
+    public Person(UUID id, String name, Integer age) {
+        super(id);
+        this.name = name;
+        this.age = age;
+    }
 
 }

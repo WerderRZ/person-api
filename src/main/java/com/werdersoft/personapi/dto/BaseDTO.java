@@ -1,5 +1,6 @@
 package com.werdersoft.personapi.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +15,14 @@ public abstract class BaseDTO {
 
     private UUID id;
 
-//    @Override
+    public BaseDTO() {
+    }
+
+    public BaseDTO(UUID id) {
+        this.id = id;
+    }
+
+    //    @Override
 //    public boolean equals(Object o) {
 //        if (this == o) return true;
 //        if (o == null || getClass() != o.getClass()) return false;
