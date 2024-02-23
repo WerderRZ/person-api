@@ -44,7 +44,7 @@ public class PersonControllerTest {
     @Autowired
     private DBQueriesUtils dbQueriesUtils;
 
-    private final String API_PATH = "/api/v1/persons";;
+    private final String API_PATH = "/api/v1/persons";
 
     @BeforeAll
     static void beforeAll() {
