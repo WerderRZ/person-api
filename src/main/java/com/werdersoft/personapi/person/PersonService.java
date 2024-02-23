@@ -15,4 +15,8 @@ public interface PersonService {
 
     void deletePersonById(UUID id);
 
+    List<PersonDTO> updatePersonsFromSiteOutSystem();
+
+    PersonDTO downloadPersonByExternalId(Integer externalId);
+
 }

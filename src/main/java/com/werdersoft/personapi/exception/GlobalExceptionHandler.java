@@ -1,17 +1,16 @@
 package com.werdersoft.personapi.exception;
 
 import org.springframework.context.support.DefaultMessageSourceResolvable;
-import org.springframework.http.HttpMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -26,15 +25,20 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorDetails> handleValidationException(BindException ex, HttpServletRequest request) {
-        var uri = request.getRequestURI();
-        var body = request.getQueryString();
+    public ResponseEntity<ErrorDetails> handleBadRequestAPIException(BindException ex, HttpServletRequest request) {
         List<String> errorMessages = ex.getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .sorted()
                 .collect(Collectors.toList());
-        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), 400, errorMessages);
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+        return getResponseEntityOfError(HttpStatus.BAD_REQUEST, errorMessages, "Bad request in service");
+    }
+
+    @ExceptionHandler(WebClientResponseException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<ErrorDetails> handleWebClientNotFoundException(WebClientResponseException ex) {
+        List<String> errorMessages = List.of("Web client exception: " + ex.getMessage());
+        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), 404, errorMessages);
+        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ResponseStatusException.class)
@@ -53,11 +57,4 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorDetails> handleException(Exception ex) {
-        Class cl = ex.getClass();
-        List<String> errorMessages = new ArrayList<>();
-        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), 400, errorMessages);
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
-    }
 }

@@ -19,8 +19,12 @@ public class Person extends BaseEntity {
 
     @Column(name = "age")
     private Integer age;
+  
+    @Column(name = "external_id")
+    private Integer externalID;
 
-    public Person() {}
+    @Column(name = "email")
+    private String email;
 
     @Builder
     public Person(UUID id, String name, Integer age) {

@@ -15,11 +15,13 @@ public class ErrorDetails {
     private LocalDateTime timestamp;
     private Integer status;
     private List<String> errors;
+    private String context;
 
     @Builder
     public ErrorDetails(LocalDateTime timestamp, Integer status, List<String> errors) {
         this.timestamp = timestamp;
         this.status = status;
         this.errors = errors;
+        this.context = context;
     }
 }

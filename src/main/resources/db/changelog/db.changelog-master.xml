@@ -84,4 +84,13 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="PA-5" author="WerderRZ">
+        <addColumn tableName="person">
+            <column name="external_id" type="int" />
+        </addColumn>
+        <addColumn tableName="person">
+            <column name="email" type="varchar(255)" />
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
