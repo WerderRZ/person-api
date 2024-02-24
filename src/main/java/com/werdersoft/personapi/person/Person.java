@@ -26,11 +26,15 @@ public class Person extends BaseEntity {
     @Column(name = "email")
     private String email;
 
+    public Person() {}
+
     @Builder
-    public Person(UUID id, String name, Integer age) {
+    public Person(UUID id, String name, Integer age, Integer externalID, String email) {
         super(id);
         this.name = name;
         this.age = age;
+        this.externalID = externalID;
+        this.email = email;
     }
 
 }

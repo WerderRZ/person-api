@@ -49,6 +49,7 @@ public class PersonControllerTest {
     @BeforeAll
     static void beforeAll() {
         container.start();
+        String urlContainer = container.getJdbcUrl();
     }
 
     @BeforeEach

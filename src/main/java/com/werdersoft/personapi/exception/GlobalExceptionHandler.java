@@ -30,7 +30,8 @@ public class GlobalExceptionHandler {
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .sorted()
                 .collect(Collectors.toList());
-        return getResponseEntityOfError(HttpStatus.BAD_REQUEST, errorMessages, "Bad request in service");
+        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), 400, errorMessages);
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(WebClientResponseException.class)
