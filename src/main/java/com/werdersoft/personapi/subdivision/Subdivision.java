@@ -5,6 +5,7 @@ import com.werdersoft.personapi.employee.Employee;
 import com.werdersoft.personapi.entity.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import java.util.*;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 @Table(name = "subdivision")
 public class Subdivision extends BaseEntity {
 
@@ -28,8 +30,6 @@ public class Subdivision extends BaseEntity {
         inverseJoinColumns = @JoinColumn(name = "company_id", referencedColumnName = "id")
     )
     private Set<Company> companies = new HashSet<>();
-
-    public Subdivision() {}
 
     @Builder
     public Subdivision(UUID id, String name, Set<Employee> employees, Set<Company> companies) {

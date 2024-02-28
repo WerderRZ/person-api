@@ -6,6 +6,7 @@ import com.werdersoft.personapi.enums.Position;
 import com.werdersoft.personapi.person.Person;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 @Table(name = "employee")
 public class Employee extends BaseEntity {
 
@@ -32,8 +34,6 @@ public class Employee extends BaseEntity {
     @ManyToOne (fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "subdivision_id", nullable = false)
     private Subdivision subdivision;
-
-    public Employee() {}
 
     @Builder
     public Employee(UUID id, Position position, BigDecimal salary, Person person, Subdivision subdivision) {
