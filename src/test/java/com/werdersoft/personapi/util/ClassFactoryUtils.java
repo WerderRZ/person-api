@@ -30,6 +30,22 @@ public class ClassFactoryUtils {
                 .build();
     }
 
+    public static PersonDTO newPersonDTOExt(int externalId) {
+        return PersonDTO.builder()
+                .name("Sam")
+                .externalID(externalId)
+                .email("sam.smith@reqres.in")
+                .build();
+    }
+
+    public static Person newPersonExt(int externalId) {
+        return Person.builder()
+                .name("Sam")
+                .externalID(externalId)
+                .email("sam.smith@reqres.in")
+                .build();
+    }
+
     public static CompanyDTO newCompanyDTO() {
         return CompanyDTO.builder()
                 .name("Werdersoft")

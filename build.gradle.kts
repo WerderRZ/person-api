@@ -49,6 +49,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-webflux")
     testImplementation("org.testcontainers:junit-jupiter:1.19.3")
     testImplementation("org.testcontainers:postgresql:1.19.3")
+    testImplementation("com.github.tomakehurst:wiremock:2.25.0")
 
     // Logging
     implementation("net.ttddyy:datasource-proxy:1.8.1")

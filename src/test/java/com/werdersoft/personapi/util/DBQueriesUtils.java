@@ -94,6 +94,8 @@ public class DBQueriesUtils {
                             .id(resultSet.getObject(1, UUID.class))
                             .name(resultSet.getString(2))
                             .age(resultSet.getInt(3))
+                            .externalID(resultSet.getInt(4))
+                            .email(resultSet.getString(5))
                             .build()
             );
         } catch (DataAccessException e) {

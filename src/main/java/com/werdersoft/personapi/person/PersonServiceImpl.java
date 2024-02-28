@@ -93,6 +93,8 @@ public class PersonServiceImpl implements PersonService {
             return personMapper.toPersonDTO(foundPerson.get());
         } else {
             ReqresUser reqresUser = reqresClient.getPersonById(externalId);
+            //Person onePerson = personMapper.toPersonFromReqresUser(reqresUser);
+            //Person twoPerson = personRepository.save(onePerson);
             return personMapper.toPersonDTO(personRepository.save(
                     personMapper.toPersonFromReqresUser(reqresUser)));
         }

@@ -1,9 +1,12 @@
 package com.werdersoft.personapi.person;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.werdersoft.personapi.exception.ErrorDetails;
 import com.werdersoft.personapi.exception.ErrorDetailsUtils;
 import com.werdersoft.personapi.util.ClassFactoryUtils;
 import com.werdersoft.personapi.util.DBQueriesUtils;
+import com.werdersoft.personapi.util.FileUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +22,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.UUID;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -43,6 +47,12 @@ public class PersonControllerTest {
 
     @Autowired
     private DBQueriesUtils dbQueriesUtils;
+
+    @Autowired
+    private FileUtils fileUtils;
+
+    @Autowired
+    private WireMockServer wireMockServer;
 
     private final String API_PATH = "/api/v1/persons";
 
@@ -118,7 +128,6 @@ public class PersonControllerTest {
         // assert
         actualResponseDTO.setTimestamp(null);
         assertThat(actualResponseDTO).isEqualTo(expectedErrorDetailsAnswer);
-        // TODO Обработка ErrorDetails после слияния
 
     }
 
@@ -247,6 +256,108 @@ public class PersonControllerTest {
 
         // assert
         assertThat(actualPersonEntity).isEmpty();
+
+    }
+
+    @Test
+    @DisplayName("GET - Успешная загрузка Person из внешней системы")
+    public void loadPersonFromExternalSystemSuccess() throws Exception {
+
+        // arrange
+        int externalId = 1;
+        String jsonBody = fileUtils.readFile("requests/get-single-reqres-user.json");
+        wireMockServer.stubFor(WireMock.get(urlEqualTo("/users/" + externalId)).willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(jsonBody)));
+
+        PersonDTO expectedPersonDTOAnswer = ClassFactoryUtils.newPersonDTOExt(externalId);
+        Person expectedPersonEntity = ClassFactoryUtils.newPersonExt(externalId);
+
+        // act
+        var actualResponseDTO = webTestClient
+                .get()
+                .uri(API_PATH + "/load/" + externalId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(PersonDTO.class)
+                .returnResult()
+                .getResponseBody();
+
+        UUID id = actualResponseDTO.getId();
+        Person actualPersonEntity = dbQueriesUtils.selectPersonsById(id).get(0);
+
+        // assert
+        expectedPersonDTOAnswer.setId(id);
+        assertThat(actualResponseDTO).isEqualTo(expectedPersonDTOAnswer);
+
+        expectedPersonEntity.setId(id);
+        assertThat(actualPersonEntity).isEqualTo(expectedPersonEntity);
+
+    }
+
+    @Test
+    @DisplayName("GET - Провальная загрузка Person из внешней системы")
+    public void loadPersonFromExternalSystemFail_WrongExternalId() {
+
+        // arrange
+        int externalId = 456;
+        wireMockServer.stubFor(WireMock.get(urlEqualTo("/users/" + externalId)).willReturn(aResponse()
+                .withStatus(404)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{}")));
+
+        // act
+        var actualResponseDTO = webTestClient
+                .get()
+                .uri(API_PATH + "/load/" + externalId)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody(ErrorDetails.class)
+                .returnResult()
+                .getResponseBody();
+
+        // assert
+        assertThat(actualResponseDTO.getStatus()).isEqualTo(404);
+        assertThat(actualResponseDTO.getErrors().get(0)).contains("Web client exception:");
+
+    }
+
+    @Test
+    @DisplayName("GET - Успешная загрузка списка Persons из внешней системы")
+    public void loadPersonsFromExternalSystemSuccess() throws Exception {
+
+        // arrange
+        String jsonBody = fileUtils.readFile("requests/get-list-reqres-users.json");
+        wireMockServer.stubFor(WireMock.get(urlEqualTo("/users?page=1")).willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody(jsonBody)));
+
+        int externalId = 1;
+        PersonDTO personDTO = ClassFactoryUtils.newPersonDTOExt(externalId);
+        List<PersonDTO> expectedPersonsListAnswer = List.of(personDTO);
+        Person expectedPersonEntity = ClassFactoryUtils.newPersonExt(externalId);
+
+        // act
+        var actualResponseDTO = webTestClient
+                .get()
+                .uri(API_PATH + "/load")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(PersonDTO.class)
+                .returnResult()
+                .getResponseBody();
+
+        UUID id = actualResponseDTO.get(0).getId();
+        Person actualPersonEntity = dbQueriesUtils.selectPersonsById(id).get(0);
+
+        // assert
+        actualResponseDTO.forEach(persDTO -> persDTO.setId(null));
+        assertThat(actualResponseDTO).isEqualTo(expectedPersonsListAnswer);
+
+        expectedPersonEntity.setId(id);
+        assertThat(actualPersonEntity).isEqualTo(expectedPersonEntity);
 
     }
 
