@@ -1,4 +1,4 @@
-package com.werdersoft.personapi.util;
+package com.werdersoft.personapi.utils;
 
 import com.werdersoft.personapi.company.Company;
 import com.werdersoft.personapi.employee.EmployeeDTO;
@@ -37,52 +37,6 @@ public class DBQueriesUtils {
         );
         tableNames.forEach(tableName -> jdbcTemplate.execute("DELETE from " + tableName));
     }
-
-    public void addRecordPersonWithId(UUID id) {
-        String sql = "INSERT INTO person(id, name, age) VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql, preparedStatement -> {
-            preparedStatement.setObject(1, id);
-            preparedStatement.setString(2, "Sam");
-            preparedStatement.setInt(3, 22);
-        });
-    }
-
-    public void addRecordCompanyWithId(UUID id) {
-        String sql = "INSERT INTO company(id, name, region) VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql, preparedStatement -> {
-            preparedStatement.setObject(1, id);
-            preparedStatement.setString(2, "Werdersoft");
-            preparedStatement.setString(3, "ASIA");
-        });
-    }
-
-    public void addRecordSubdivisionWithId(UUID id) {
-        String sql = "INSERT INTO subdivision (id, name) VALUES (?, ?)";
-        jdbcTemplate.update(sql, preparedStatement -> {
-            preparedStatement.setObject(1, id);
-            preparedStatement.setString(2, "IT");
-        });
-    }
-
-    public void addRecordSubdivisionCompanyWithIds(UUID subdivisionId, UUID companyId) {
-        String sql = "INSERT INTO \"subdivisions-companies\" (subdivision_id, company_id) VALUES (?, ?)";
-        jdbcTemplate.update(sql, preparedStatement -> {
-            preparedStatement.setObject(1, subdivisionId);
-            preparedStatement.setObject(2, companyId);
-        });
-    }
-
-    public void addRecordEmployeeWithId(UUID id, UUID personId, UUID subdivisionId) {
-        String sql = "INSERT INTO employee (id, position, salary, person_id, subdivision_id) VALUES (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, preparedStatement -> {
-            preparedStatement.setObject(1, id);
-            preparedStatement.setString(2, "MANAGER");
-            preparedStatement.setBigDecimal(3, new BigDecimal(300));
-            preparedStatement.setObject(4, personId);
-            preparedStatement.setObject(5, subdivisionId);
-        });
-    }
-
 
     public List<Person> selectPersonsById(UUID id) {
         String sql = "SELECT * FROM person WHERE id = ?";

@@ -1,0 +1,1 @@
+INSERT INTO subdivision (id, name) VALUES ('989a4f41-0af7-45d2-a32e-0f99b1241b29', 'IT')

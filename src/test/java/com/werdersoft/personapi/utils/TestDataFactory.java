@@ -1,8 +1,7 @@
-package com.werdersoft.personapi.util;
+package com.werdersoft.personapi.utils;
 
 import com.werdersoft.personapi.company.Company;
 import com.werdersoft.personapi.company.CompanyDTO;
-import com.werdersoft.personapi.employee.Employee;
 import com.werdersoft.personapi.employee.EmployeeDTO;
 import com.werdersoft.personapi.enums.Position;
 import com.werdersoft.personapi.enums.Region;
@@ -14,7 +13,7 @@ import com.werdersoft.personapi.subdivision.SubdivisionDTO;
 import java.math.BigDecimal;
 import java.util.*;
 
-public class ClassFactoryUtils {
+public class TestDataFactory {
 
     public static PersonDTO newPersonDTO() {
         return PersonDTO.builder()

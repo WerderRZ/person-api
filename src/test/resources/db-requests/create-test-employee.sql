@@ -1,0 +1,1 @@
+INSERT INTO employee (id, position, salary, person_id, subdivision_id) VALUES ('3140e0f8-3d51-4bce-9ac0-347ef0ded50f', 'MANAGER', 300, '8edc1f88-7bc5-4814-91b3-abd6daeba0c0', '989a4f41-0af7-45d2-a32e-0f99b1241b29')

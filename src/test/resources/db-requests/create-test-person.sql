@@ -1,0 +1,1 @@
+INSERT INTO person (id, name, age) VALUES ('8edc1f88-7bc5-4814-91b3-abd6daeba0c0', 'Sam', 22)

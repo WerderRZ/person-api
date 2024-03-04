@@ -1,0 +1,1 @@
+INSERT INTO "subdivisions-companies" (subdivision_id, company_id) VALUES ('989a4f41-0af7-45d2-a32e-0f99b1241b29', '2c1b37ff-a629-4bc3-8496-91c143540924')

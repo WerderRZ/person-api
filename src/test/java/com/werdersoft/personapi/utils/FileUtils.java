@@ -1,4 +1,4 @@
-package com.werdersoft.personapi.util;
+package com.werdersoft.personapi.utils;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -11,10 +11,14 @@ import java.nio.file.Files;
 @Component
 public class FileUtils {
 
-    public String readFile(String filePath) throws IOException {
+    public String readFile(String filePath) {
         Resource resource = new ClassPathResource(filePath);
-        File file = resource.getFile();
-        return new String(Files.readAllBytes(file.toPath()));
+        try {
+            File file = resource.getFile();
+            return new String(Files.readAllBytes(file.toPath()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

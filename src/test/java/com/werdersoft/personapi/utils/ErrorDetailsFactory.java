@@ -1,9 +1,11 @@
-package com.werdersoft.personapi.exception;
+package com.werdersoft.personapi.utils;
+
+import com.werdersoft.personapi.exception.ErrorDetails;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ErrorDetailsUtils {
+public class ErrorDetailsFactory {
 
     public static ErrorDetails newErrorDetails400Check(List<String> errors) {
         return getErrorDetailsWithOneError(400, errors);

@@ -1,22 +1,18 @@
-package com.werdersoft.personapi.person;
+package com.werdersoft.personapi.controllers;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.werdersoft.personapi.BaseControllerTest;
 import com.werdersoft.personapi.exception.ErrorDetails;
-import com.werdersoft.personapi.exception.ErrorDetailsUtils;
-import com.werdersoft.personapi.util.ClassFactoryUtils;
-import com.werdersoft.personapi.util.DBQueriesUtils;
-import com.werdersoft.personapi.util.FileUtils;
+import com.werdersoft.personapi.person.Person;
+import com.werdersoft.personapi.person.PersonDTO;
+import com.werdersoft.personapi.utils.ErrorDetailsFactory;
+import com.werdersoft.personapi.utils.TestDataFactory;
+import com.werdersoft.personapi.utils.FileUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.test.context.jdbc.Sql;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -25,28 +21,9 @@ import java.util.UUID;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DisplayName("Тесты rest-контроллера PersonController")
 @ActiveProfiles("test")
-@Testcontainers
-// TODO Создать application-test.properties c настройками datasource
-public class PersonControllerTest {
-
-    @Container
-    private static PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:16");
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", container::getJdbcUrl);
-        registry.add("spring.datasource.username", container::getUsername);
-        registry.add("spring.datasource.password", container::getPassword);
-    }
-
-    @Autowired
-    private WebTestClient webTestClient;
-
-    @Autowired
-    private DBQueriesUtils dbQueriesUtils;
+public class PersonControllerTest extends BaseControllerTest {
 
     @Autowired
     private FileUtils fileUtils;
@@ -56,30 +33,14 @@ public class PersonControllerTest {
 
     private final String API_PATH = "/api/v1/persons";
 
-    @BeforeAll
-    static void beforeAll() {
-        container.start();
-        String urlContainer = container.getJdbcUrl();
-    }
-
-    @BeforeEach
-    void prepare() {
-        dbQueriesUtils.deleteAllRecords();
-    }
-
-    @AfterAll
-    static void afterAll() {
-        container.stop();
-    }
-
     @Test
-    @DisplayName("POST - Успешное cоздание Person")
+    @DisplayName("Создание Person - Успеx")
     public void createPersonSuccess() {
 
         // arrange
-        PersonDTO requestPersonDTO = ClassFactoryUtils.newPersonDTO();
-        PersonDTO expectedPersonDTOAnswer = ClassFactoryUtils.newPersonDTO();
-        Person expectedPersonEntity = ClassFactoryUtils.newPerson();
+        PersonDTO requestPersonDTO = TestDataFactory.newPersonDTO();
+        PersonDTO expectedPersonDTOAnswer = TestDataFactory.newPersonDTO();
+        Person expectedPersonEntity = TestDataFactory.newPerson();
 
         // act
         var actualResponseDTO = webTestClient
@@ -105,14 +66,14 @@ public class PersonControllerTest {
     }
 
     @Test
-    @DisplayName("POST - Провальное cоздание Person")
+    @DisplayName("Cоздание Person - Провал")
     public void createPersonFail() {
 
         // arrange
-        PersonDTO requestPersonDTO = ClassFactoryUtils.newPersonDTO();
+        PersonDTO requestPersonDTO = TestDataFactory.newPersonDTO();
         requestPersonDTO.setAge(-30);
         ErrorDetails expectedErrorDetailsAnswer =
-                ErrorDetailsUtils.newErrorDetails400Check(List.of("Age should be greater than 0"));
+                ErrorDetailsFactory.newErrorDetails400Check(List.of("Age should be greater than 0"));
 
         // act
         var actualResponseDTO = webTestClient
@@ -132,19 +93,18 @@ public class PersonControllerTest {
     }
 
     @Test
-    @DisplayName("GET - Успешное получение Person по ID")
+    @DisplayName("Получение Person по ID - Успех")
+    @Sql(CREATE_PERSON_SQL_PATH)
     public void getPersonByIdSuccess() {
 
         // arrange
-        UUID id = UUID.randomUUID();
-        PersonDTO expectedPersonDTOAnswer = ClassFactoryUtils.newPersonDTO();
-        expectedPersonDTOAnswer.setId(id);
-        dbQueriesUtils.addRecordPersonWithId(id);
+        PersonDTO expectedPersonDTOAnswer = TestDataFactory.newPersonDTO();
+        expectedPersonDTOAnswer.setId(TEST_PERSON_ID);
 
         // act
         var actualResponseDTO = webTestClient
                 .get()
-                .uri(API_PATH + "/" + id)
+                .uri(API_PATH + "/" + TEST_PERSON_ID)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(PersonDTO.class)
@@ -157,13 +117,13 @@ public class PersonControllerTest {
     }
 
     @Test
-    @DisplayName("GET - Провальное получение Person по ID")
+    @DisplayName("Получение Person по ID - Провал")
     public void getPersonByIdFail() {
 
         // arrange
         UUID failId = UUID.randomUUID();
         String uri = API_PATH + "/" + failId;
-        ErrorDetails expectedErrorDetailsAnswer = ErrorDetailsUtils.newErrorDetails404IncorrectURI(uri);
+        ErrorDetails expectedErrorDetailsAnswer = ErrorDetailsFactory.newErrorDetails404IncorrectURI(uri);
 
         // act
         var actualResponseDTO = webTestClient
@@ -182,15 +142,13 @@ public class PersonControllerTest {
     }
 
     @Test
-    @DisplayName("GET - Получение всех Person")
+    @DisplayName("Получение всех Person")
+    @Sql(CREATE_PERSON_SQL_PATH)
     public void getAllPersonsSuccess() {
 
         // arrange
-        UUID id = UUID.randomUUID();
-        dbQueriesUtils.addRecordPersonWithId(id);
-
-        PersonDTO personDTO = ClassFactoryUtils.newPersonDTO();
-        personDTO.setId(id);
+        PersonDTO personDTO = TestDataFactory.newPersonDTO();
+        personDTO.setId(TEST_PERSON_ID);
         List<PersonDTO> expectedPersonsListAnswer = List.of(personDTO);
 
         // act
@@ -209,28 +167,26 @@ public class PersonControllerTest {
     }
 
     @Test
-    @DisplayName("UPDATE - Обновление Person по ID")
+    @DisplayName("Обновление Person по ID")
+    @Sql(CREATE_PERSON_SQL_PATH)
     public void updatePersonByIdSuccess() {
 
         // arrange
-        UUID id = UUID.randomUUID();
-
         PersonDTO requestPersonDTO = PersonDTO.builder().name("Tom").age(28).build();
-        PersonDTO expectedPersonDTOAnswer = PersonDTO.builder().id(id).name("Tom").age(28).build();
-        dbQueriesUtils.addRecordPersonWithId(id);
-        Person expectedPersonEntity = Person.builder().id(id).name("Tom").age(28).build();
+        PersonDTO expectedPersonDTOAnswer = PersonDTO.builder().id(TEST_PERSON_ID).name("Tom").age(28).build();
+        Person expectedPersonEntity = Person.builder().id(TEST_PERSON_ID).name("Tom").age(28).build();
 
         //act
         var actualResponseDTO = webTestClient
                 .put()
-                .uri(API_PATH + "/" + id)
+                .uri(API_PATH + "/" + TEST_PERSON_ID)
                 .body(Mono.just(requestPersonDTO), PersonDTO.class)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(PersonDTO.class)
                 .returnResult()
                 .getResponseBody();
-        Person actualPersonEntity = dbQueriesUtils.selectPersonsById(id).get(0);
+        Person actualPersonEntity = dbQueriesUtils.selectPersonsById(TEST_PERSON_ID).get(0);
 
         // assert
         assertThat(actualResponseDTO).isEqualTo(expectedPersonDTOAnswer);
@@ -239,20 +195,18 @@ public class PersonControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE - Удаление Person по ID")
+    @DisplayName("Удаление Person по ID")
+    @Sql(CREATE_PERSON_SQL_PATH)
     public void deletePersonByIdSuccess() {
 
         // arrange
-        UUID id = UUID.randomUUID();
-        dbQueriesUtils.addRecordPersonWithId(id);
-
-        //act
+        // act
         var actualResponseDTO = webTestClient
                 .delete()
-                .uri(API_PATH + "/" + id)
+                .uri(API_PATH + "/" + TEST_PERSON_ID)
                 .exchange()
                 .expectStatus().isNoContent();
-        List<Person> actualPersonEntity = dbQueriesUtils.selectPersonsById(id);
+        List<Person> actualPersonEntity = dbQueriesUtils.selectPersonsById(TEST_PERSON_ID);
 
         // assert
         assertThat(actualPersonEntity).isEmpty();
@@ -260,19 +214,19 @@ public class PersonControllerTest {
     }
 
     @Test
-    @DisplayName("GET - Успешная загрузка Person из внешней системы")
-    public void loadPersonFromExternalSystemSuccess() throws Exception {
+    @DisplayName("Загрузка Person из внешней системы - Успех")
+    public void loadPersonFromExternalSystemSuccess() {
 
         // arrange
         int externalId = 1;
-        String jsonBody = fileUtils.readFile("requests/get-single-reqres-user.json");
+        String jsonBody = fileUtils.readFile("json-requests/get-single-reqres-user.json");
         wireMockServer.stubFor(WireMock.get(urlEqualTo("/users/" + externalId)).willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")
                 .withBody(jsonBody)));
 
-        PersonDTO expectedPersonDTOAnswer = ClassFactoryUtils.newPersonDTOExt(externalId);
-        Person expectedPersonEntity = ClassFactoryUtils.newPersonExt(externalId);
+        PersonDTO expectedPersonDTOAnswer = TestDataFactory.newPersonDTOExt(externalId);
+        Person expectedPersonEntity = TestDataFactory.newPersonExt(externalId);
 
         // act
         var actualResponseDTO = webTestClient
@@ -297,7 +251,7 @@ public class PersonControllerTest {
     }
 
     @Test
-    @DisplayName("GET - Провальная загрузка Person из внешней системы")
+    @DisplayName("Загрузка Person из внешней системы - Провал")
     public void loadPersonFromExternalSystemFail_WrongExternalId() {
 
         // arrange
@@ -324,20 +278,20 @@ public class PersonControllerTest {
     }
 
     @Test
-    @DisplayName("GET - Успешная загрузка списка Persons из внешней системы")
-    public void loadPersonsFromExternalSystemSuccess() throws Exception {
+    @DisplayName("Загрузка списка Persons из внешней системы - Успех")
+    public void loadPersonsFromExternalSystemSuccess() {
 
         // arrange
-        String jsonBody = fileUtils.readFile("requests/get-list-reqres-users.json");
+        String jsonBody = fileUtils.readFile("json-requests/get-list-reqres-users.json");
         wireMockServer.stubFor(WireMock.get(urlEqualTo("/users?page=1")).willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")
                 .withBody(jsonBody)));
 
         int externalId = 1;
-        PersonDTO personDTO = ClassFactoryUtils.newPersonDTOExt(externalId);
+        PersonDTO personDTO = TestDataFactory.newPersonDTOExt(externalId);
         List<PersonDTO> expectedPersonsListAnswer = List.of(personDTO);
-        Person expectedPersonEntity = ClassFactoryUtils.newPersonExt(externalId);
+        Person expectedPersonEntity = TestDataFactory.newPersonExt(externalId);
 
         // act
         var actualResponseDTO = webTestClient
