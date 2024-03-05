@@ -16,7 +16,7 @@ public class WireMockConfig {
     private int wiremockPort;
 
     @Value("${wiremock.host}")
-    private String wiremockHost;
+    private static String wiremockHost;
 
     @Bean(initMethod = "start", destroyMethod = "stop")
     public WireMockServer wireMockServer() {

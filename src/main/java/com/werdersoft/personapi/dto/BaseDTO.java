@@ -22,16 +22,4 @@ public abstract class BaseDTO {
         this.id = id;
     }
 
-    //    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        BaseDTO that = (BaseDTO) o;
-//        return id != null && Objects.equals(getId(), that.getId());
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return 13;
-//    }
 }

@@ -48,13 +48,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         Person person = personService.findPersonById(employeeDTO.getPersonId());
         Subdivision subdivision = subdivisionService.findSubdivisionById(employeeDTO.getSubdivisionId());
 
-        Employee employeePre = employeeMapper.toEmployee(employeeDTO, person, subdivision);
-        Employee employee = employeeRepository.save(employeePre);
-        EmployeeDTO employeeDTOfinal = employeeMapper.toEmployeeDTO(employee);
-        return employeeDTOfinal;
-
-        //return employeeMapper.toEmployeeDTO(employeeRepository
-        //        .save(employeeMapper.toEmployee(employeeDTO, person, subdivision)));
+        return employeeMapper.toEmployeeDTO(employeeRepository
+                .save(employeeMapper.toEmployee(employeeDTO, person, subdivision)));
     }
 
     public Employee findEmployeeById(UUID id) {

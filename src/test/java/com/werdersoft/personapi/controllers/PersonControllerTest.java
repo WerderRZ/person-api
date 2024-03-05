@@ -31,7 +31,7 @@ public class PersonControllerTest extends BaseControllerTest {
     @Autowired
     private WireMockServer wireMockServer;
 
-    private final String API_PATH = "/api/v1/persons";
+    private static final String API_PATH = "/api/v1/persons";
 
     @Test
     @DisplayName("Создание Person - Успеx")

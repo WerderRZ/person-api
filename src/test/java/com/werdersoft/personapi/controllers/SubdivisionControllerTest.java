@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Тесты rest-контроллера SubdivisionController")
 public class SubdivisionControllerTest extends BaseControllerTest {
 
-    private final String API_PATH = "/api/v1/subdivisions";
+    private static final String API_PATH = "/api/v1/subdivisions";
 
     @Test
     @DisplayName("Создание Subdivision - Успех")

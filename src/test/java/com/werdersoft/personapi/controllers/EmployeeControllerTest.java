@@ -23,7 +23,7 @@ public class EmployeeControllerTest extends BaseControllerTest {
     @Autowired
     private FileUtils fileUtils;
 
-    private final String API_PATH = "/api/v1/employees";
+    private static final String API_PATH = "/api/v1/employees";
 
     @Test
     @DisplayName("Создание Employee - Успех")

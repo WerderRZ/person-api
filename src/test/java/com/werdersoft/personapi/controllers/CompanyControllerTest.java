@@ -24,7 +24,7 @@ public class CompanyControllerTest extends BaseControllerTest {
     @Autowired
     private FileUtils fileUtils;
 
-    private final String API_PATH = "/api/v1/companies";
+    private static final String API_PATH = "/api/v1/companies";
 
     @Test
     @DisplayName("Cоздание Company - Успех")
