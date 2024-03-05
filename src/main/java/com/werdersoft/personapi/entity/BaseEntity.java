@@ -1,7 +1,9 @@
 package com.werdersoft.personapi.entity;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -18,6 +20,13 @@ public abstract class BaseEntity {
     @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id")
     private UUID id;
+
+    public BaseEntity() {
+    }
+
+    public BaseEntity(UUID id) {
+        this.id = id;
+    }
 
     @Override
     public boolean equals(Object o) {

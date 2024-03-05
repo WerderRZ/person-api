@@ -47,6 +47,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeDTO createEmployee(EmployeeDTO employeeDTO) {
         Person person = personService.findPersonById(employeeDTO.getPersonId());
         Subdivision subdivision = subdivisionService.findSubdivisionById(employeeDTO.getSubdivisionId());
+
         return employeeMapper.toEmployeeDTO(employeeRepository
                 .save(employeeMapper.toEmployee(employeeDTO, person, subdivision)));
     }

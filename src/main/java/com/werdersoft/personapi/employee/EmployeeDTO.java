@@ -2,6 +2,7 @@ package com.werdersoft.personapi.employee;
 
 import com.werdersoft.personapi.dto.BaseDTO;
 import com.werdersoft.personapi.enums.Position;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -23,4 +24,13 @@ public class EmployeeDTO extends BaseDTO {
 
     @NotNull(message = "Field 'subdivisionId' cannot be empty")
     private UUID subdivisionId;
+
+    @Builder
+    public EmployeeDTO(UUID id, Position position, BigDecimal salary, UUID personId, UUID subdivisionId) {
+        super(id);
+        this.position = position;
+        this.salary = salary;
+        this.personId = personId;
+        this.subdivisionId = subdivisionId;
+    }
 }

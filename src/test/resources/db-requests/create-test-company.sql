@@ -1,0 +1,1 @@
+INSERT INTO company(id, name, region) VALUES ('2c1b37ff-a629-4bc3-8496-91c143540924', 'Werdersoft', 'ASIA')

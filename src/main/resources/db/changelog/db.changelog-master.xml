@@ -48,11 +48,11 @@
             <column name="salary" type="decimal" />
             <column name="person_id" type="UUID">
                 <constraints unique="true" foreignKeyName="FK_EMPLOYEE_ON_PERSON"
-                             referencedTableName="person" referencedColumnNames="id" />
+                             referencedTableName="person" referencedColumnNames="id" deleteCascade="true" />
             </column>
             <column name="subdivision_id" type="UUID">
                 <constraints foreignKeyName="FK_EMPLOYEE_ON_SUBDIVISION"
-                             referencedTableName="subdivision" referencedColumnNames="id" />
+                             referencedTableName="subdivision" referencedColumnNames="id" deleteCascade="true" />
             </column>
         </createTable>
     </changeSet>
@@ -71,12 +71,12 @@
     <changeSet id="PA-3-4-1" author="WerderRZ">
         <addForeignKeyConstraint baseColumnNames="subdivision_id" baseTableName="subdivisions-companies"
                                  constraintName="FK_HAS_ON_SUBDIVISION"
-                                 referencedColumnNames="id" referencedTableName="subdivision" />
+                                 referencedColumnNames="id" referencedTableName="subdivision" deleteCascade="true" />
     </changeSet>
     <changeSet id="PA-3-4-2" author="WerderRZ">
         <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="subdivisions-companies"
                                  constraintName="FK_HAS_ON_COMPANY"
-                                 referencedColumnNames="id" referencedTableName="company" />
+                                 referencedColumnNames="id" referencedTableName="company" deleteCascade="true" />
     </changeSet>
     <changeSet id="PA-3-5" author="WerderRZ">
         <addColumn tableName="company">

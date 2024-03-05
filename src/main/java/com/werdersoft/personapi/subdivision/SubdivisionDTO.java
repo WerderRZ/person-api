@@ -1,6 +1,7 @@
 package com.werdersoft.personapi.subdivision;
 
 import com.werdersoft.personapi.dto.BaseDTO;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -20,4 +21,12 @@ public class SubdivisionDTO extends BaseDTO {
     private List<UUID> employeesIds;
 
     private List<UUID> companiesIds;
+
+    @Builder
+    public SubdivisionDTO(UUID id, String name, List<UUID> employeesIds, List<UUID> companiesIds) {
+        super(id);
+        this.name = name;
+        this.employeesIds = employeesIds;
+        this.companiesIds = companiesIds;
+    }
 }

@@ -141,7 +141,10 @@ DELETE {{host}}/persons/{{person2_id}}
     });
 %}
 
-### Download Person By External ID
+### Download Person By External ID - Succes
+GET {{host}}/persons/load/1
+
+### Download Person By External ID - Fail
 GET {{host}}/persons/load/456
 
 ### Download All Persons

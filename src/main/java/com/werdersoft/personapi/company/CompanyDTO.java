@@ -2,6 +2,7 @@ package com.werdersoft.personapi.company;
 
 import com.werdersoft.personapi.dto.BaseDTO;
 import com.werdersoft.personapi.enums.Region;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -23,4 +24,12 @@ public class CompanyDTO extends BaseDTO {
     private Region region;
 
     private List<UUID> subdivisionsIds;
+
+    @Builder
+    public CompanyDTO(UUID id, String name, Region region, List<UUID> subdivisionsIds) {
+        super(id);
+        this.name = name;
+        this.region = region;
+        this.subdivisionsIds = subdivisionsIds;
+    }
 }
